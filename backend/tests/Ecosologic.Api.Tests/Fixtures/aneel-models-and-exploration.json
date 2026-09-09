@@ -1,0 +1,36 @@
+{
+  "_comment": "Fixture SINTETICA para testes do adaptador ANEEL. Estrutura ILUSTRATIVA da resposta /explore/reports/{id}/modelsAndExploration do portal Power BI. NAO contem dados oficiais da ANEEL; serve apenas para validar a extracao do comando de consulta (SemanticQueryDataShapeCommand) do visual do relatorio. O comando do visual e usado somente como fonte dos nomes de propriedade/entidade do modelo.",
+  "exploration": {
+    "version": "1.0.0",
+    "sections": [
+      {
+        "displayName": "Relatorio",
+        "visualContainers": [
+          {
+            "query": {
+              "Commands": [
+                {
+                  "SemanticQueryDataShapeCommand": {
+                    "Query": {
+                      "From": [
+                        { "Name": "c", "Entity": "Componentes", "Type": 0 }
+                      ],
+                      "Select": [
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Subgrupo" } },
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Componente Tarifária" } },
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Unidade" } },
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Valor" } },
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Início Vigência" } },
+                        { "Column": { "Expression": { "SourceRef": { "Source": "c" } }, "Property": "Fim Vigência" } }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

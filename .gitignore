@@ -1,0 +1,54 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# SSH and TLS private material
+*.pem
+*.key
+*.p12
+*.pfx
+*.ppk
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
+# Server credentials and local overrides
+ops/.env
+ops/.env.*
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Database dumps and production exports
+*.dump
+*.sql
+*.sql.gz
+*.tar
+*.tar.gz
+backups/
+backup/
+*.bak
+
+# Logs and runtime data
+*.log
+logs/
+runtime/
+uploads/
+
+# Certificates and generated deployment files
+*.crt
+*.csr
+*.orig
+*.rej
+
+# .NET build artifacts
+**/bin/
+**/obj/
+
+# Frontend build and test artifacts
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+frontend/test-results/

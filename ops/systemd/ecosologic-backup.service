@@ -1,0 +1,19 @@
+[Unit]
+Description=Backup diario do banco e volumes do Ecosologic
+Requires=docker.service
+After=network-online.target docker.service
+OnFailure=ecosologic-backup-failure.service
+
+[Service]
+Type=oneshot
+User=hannibal
+Group=hannibal
+SupplementaryGroups=docker
+WorkingDirectory=/home/hannibal/ecosologic
+ExecStart=/bin/sh /home/hannibal/ecosologic/ops/backup-ecosologic.sh
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=3600
+
+[Install]
+WantedBy=multi-user.target

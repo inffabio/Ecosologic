@@ -1,0 +1,61 @@
+<div class="bell-wrap">
+  <button
+    type="button"
+    class="bell-button"
+    (click)="toggle()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="true"
+    aria-controls="notifications-panel"
+    [attr.aria-label]="unread() > 0 ? 'Notificações, ' + unread() + ' não lidas' : 'Notificações'">
+    <span class="bell-icon" aria-hidden="true">◔</span>
+    @if (unread() > 0) {
+      <span class="badge" aria-hidden="true">{{ unread() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="panel" id="notifications-panel" role="region" aria-label="Bandeja de notificações">
+      <div class="panel-header">
+        <strong>Notificações</strong>
+        @if (unread() > 0) {
+          <button type="button" class="mark-all" (click)="markAllRead()" [disabled]="markAllBusy()">Marcar todas como lidas</button>
+        }
+      </div>
+
+      @if (loading()) {
+        <p class="state">Carregando notificações...</p>
+      } @else if (error()) {
+        <p class="state error">{{ error() }}</p>
+      } @else if (notifications().length === 0) {
+        <p class="state">Nenhuma notificação.</p>
+      } @else {
+        <ul class="list">
+          @for (item of notifications(); track item.id) {
+            <li [class.unread]="!item.readAt">
+              <div class="item-top">
+                <a class="link" [routerLink]="['/admin/leads', item.leadId]" (click)="close()">{{ item.title }}</a>
+                @if (!item.readAt) {
+                  <button
+                    type="button"
+                    class="mark-read"
+                    [attr.aria-label]="'Marcar como lida: ' + item.title"
+                    (click)="markRead(item)">Marcar como lida</button>
+                }
+              </div>
+              <span class="meta">
+                <span class="kind">{{ kindLabel(item.kind) }}</span>
+                <span class="due">{{ item.dueAt | date: 'dd/MM/yyyy' }}</span>
+              </span>
+            </li>
+          }
+        </ul>
+        <div class="panel-footer">
+          <span class="note">A bandeja mostra no máximo 100 notificações por vez.</span>
+          @if (hasMore()) {
+            <button type="button" class="load-more" (click)="loadMore()" [disabled]="loadingMore()">Carregar mais</button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

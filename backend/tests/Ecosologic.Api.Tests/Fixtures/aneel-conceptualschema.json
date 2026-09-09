@@ -1,0 +1,9 @@
+{
+  "_comment": "Fixture SINTETICA para testes do adaptador ANEEL. Estrutura ILUSTRATIVA da resposta /explore/reports/{id}/conceptualschema do portal Power BI. NAO contem dados oficiais da ANEEL; serve apenas para validar o bootstrap da sessao de consulta.",
+  "schema": {
+    "name": "Entity",
+    "entities": [
+      { "name": "Componentes", "fields": [] }
+    ]
+  }
+}

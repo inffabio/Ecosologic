@@ -1,0 +1,103 @@
+:host { position: relative; display: inline-block; }
+.bell-wrap { position: relative; }
+.bell-button {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: #142d39;
+  color: #fff;
+  font-size: 1.15rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bell-button:hover { background: #214958; }
+.bell-button:focus-visible { outline: 3px solid #f5c84c; outline-offset: 4px; }
+.bell-icon { line-height: 1; }
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #f5c84c;
+  color: #10202c;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  max-width: 90vw;
+  background: #fff;
+  color: #152431;
+  box-shadow: 0 12px 32px rgba(16, 32, 44, 0.18);
+  z-index: 50;
+}
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #e5e8e5;
+}
+.panel-header strong { font: 600 0.9rem 'Manrope'; }
+.mark-all {
+  border: 0;
+  background: transparent;
+  color: #49646b;
+  font-size: 0.7rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.mark-all:hover { color: #152431; }
+.mark-all:disabled { color: #9aa5ab; cursor: default; }
+.state { padding: 1.5rem 1rem; margin: 0; color: #66747b; font-size: 0.78rem; }
+.state.error { color: #b3473d; }
+.list { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow-y: auto; }
+.list li { padding: 0.75rem 1rem; border-bottom: 1px solid #eef0ee; }
+.list li.unread { background: #f0f4f0; }
+.item-top { display: flex; justify-content: space-between; gap: 0.5rem; align-items: flex-start; }
+.link { color: #152431; text-decoration: none; font-size: 0.78rem; font-weight: 600; line-height: 1.35; }
+.link:hover { color: #397b62; }
+.link:focus-visible { outline: 3px solid #f5c84c; outline-offset: 4px; }
+.mark-read {
+  border: 0;
+  background: transparent;
+  color: #49a67a;
+  font-size: 0.65rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mark-read:hover { text-decoration: underline; }
+.meta { display: flex; gap: 0.6rem; margin-top: 0.35rem; font-size: 0.65rem; color: #738189; }
+.kind { color: #397b62; background: #e0f0e6; padding: 0.15rem 0.45rem; }
+.panel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-top: 1px solid #e5e8e5;
+}
+.note { font-size: 0.65rem; color: #738189; }
+.load-more {
+  border: 0;
+  background: transparent;
+  color: #397b62;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.load-more:hover { text-decoration: underline; }
+.load-more:disabled { color: #9aa5ab; cursor: default; }

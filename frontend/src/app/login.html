@@ -1,0 +1,17 @@
+<main class="login-shell">
+  <section class="login-card">
+    <img class="login-brand" src="assets/brand/logo.png" alt="Ecosologic" />
+    <h1>Acesso administrativo</h1>
+    <p class="login-hint">Entre para acompanhar leads e atualizar o painel.</p>
+    <form (ngSubmit)="submit()" #loginForm="ngForm">
+      <label for="email">E-mail
+        <input id="email" name="email" type="email" [(ngModel)]="email" required autocomplete="username" placeholder="voce@ecosologic.com.br" />
+      </label>
+      <label for="password">Senha
+        <input id="password" name="password" type="password" [(ngModel)]="password" required autocomplete="current-password" placeholder="Sua senha" />
+      </label>
+      <button class="login-button" type="submit" [disabled]="!loginForm.valid">Entrar <span aria-hidden="true">→</span></button>
+      <p class="login-error" aria-live="polite">{{ error() }}</p>
+    </form>
+  </section>
+</main>

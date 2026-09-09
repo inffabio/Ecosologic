@@ -1,0 +1,70 @@
+{
+  "_comment": "Fixture SINTETICA para testes do adaptador ANEEL. Estrutura ILUSTRATIVA (descriptor + DSR com compressao por dicionario) da resposta /explore/querydata do portal Power BI. Os valores de tarifa abaixo sao ILUSTRATIVOS e NAO sao tarifas oficiais da ANEEL; nunca devem ser usados em producao.",
+  "descriptor": {
+    "Select": [
+      { "Column": { "Property": "PwrBI Todos_agentes_IdAgtMAX" } },
+      { "Column": { "Property": "Componentes.Grupo" } },
+      { "Column": { "Property": "Componentes.Subgrupo" } },
+      { "Column": { "Property": "Componentes.Modalidade" } },
+      { "Column": { "Property": "Componentes.Posto Tarifário" } },
+      { "Column": { "Property": "Componentes.Componente Tarifária" } },
+      { "Column": { "Property": "Componentes.Unidade" } },
+      { "Column": { "Property": "Componentes.Valor" } },
+      { "Column": { "Property": "Componentes.Resolução" } },
+      { "Column": { "Property": "Componentes.Início Vigência" } },
+      { "Column": { "Property": "Componentes.Fim Vigência" } }
+    ]
+  },
+  "results": [
+    {
+      "result": {
+        "data": {
+          "dsr": {
+            "DS": [
+              {
+                "PH": [
+                  { "DM": 0 },
+                  { "DM": 1 },
+                  { "DM": 2 },
+                  { "DM": 3 },
+                  { "DM": 4 },
+                  { "DM": 5 },
+                  { "DM": 6 },
+                  { "DM": 7 },
+                  { "DM": 8 },
+                  { "DM": 9 },
+                  { "DM": 10 }
+                ],
+                "SH": { "R": 6, "C": 11 },
+                "D0": [ 0, 0, 0, 1, 1, 1 ],
+                "D1": [ 0, 0, 0, 0, 0, 0 ],
+                "D2": [ 0, 1, 2, 0, 1, 2 ],
+                "D3": [ 0, 0, 0, 0, 0, 0 ],
+                "D4": [ 0, 0, 0, 0, 0, 0 ],
+                "D5": [ 0, 0, 0, 0, 0, 0 ],
+                "D6": [ 0, 0, 0, 0, 0, 0 ],
+                "D7": [ 0, 1, 2, 3, 4, 5 ],
+                "D8": [ 0, 0, 0, 0, 0, 0 ],
+                "D9": [ 0, 0, 0, 0, 0, 0 ],
+                "D10": [ 0, 0, 0, 0, 0, 0 ]
+              }
+            ],
+            "ValueDicts": {
+              "D0": [ "Light", "Enel RJ" ],
+              "D1": [ "B" ],
+              "D2": [ "B1", "B2", "B3" ],
+              "D3": [ "Convencional" ],
+              "D4": [ "Único" ],
+              "D5": [ "TUSD Fio B" ],
+              "D6": [ "R$/MWh" ],
+              "D7": [ "41.20", "39.80", "38.50", "42.10", "40.30", "39.00" ],
+              "D8": [ "RES 3.242/2024" ],
+              "D9": [ "2024-01-01" ],
+              "D10": [ "2024-12-31" ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ./backend/src
+      dockerfile: Ecosologic.Api/Dockerfile
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Auth__JwtKey: ${AUTH_JWT_KEY}
+      Auth__AdminEmail: ${AUTH_ADMIN_EMAIL}
+      Auth__AdminPassword: ${AUTH_ADMIN_PASSWORD}
+      Hangfire__StorageSchema: ${HANGFIRE_STORAGE_SCHEMA:-hangfire}
+      Hangfire__DashboardEnabled: ${HANGFIRE_DASHBOARD_ENABLED:-false}
+      Crm__NotificationCron: ${CRM_NOTIFICATION_CRON:-*/5 * * * *}
+      Tariffs__SyncCron: ${TARIFFS_SYNC_CRON:-0 3 1 * *}
+      Tariffs__TimeZoneId: ${TARIFFS_TIMEZONE_ID:-America/Sao_Paulo}
+      Tariffs__SourceUrl: ${TARIFFS_SOURCE_URL:-}
+      Tariffs__HttpTimeoutSeconds: ${TARIFFS_HTTP_TIMEOUT_SECONDS:-30}
+      Tariffs__MaxRetries: ${TARIFFS_MAX_RETRIES:-3}
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "127.0.0.1:5157:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - media-data:/app/wwwroot/uploads
+      - api-data-protection-keys:/root/.aspnet/DataProtection-Keys
+
+  web:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+
+networks:
+  default:
+    name: ecosologic_default
+
+volumes:
+  postgres-data:
+  media-data:
+  api-data-protection-keys:
+    name: ecosologic_api_data_protection_keys

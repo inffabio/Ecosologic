@@ -1,0 +1,82 @@
+<main class="editor-shell">
+  <a class="back-link" href="/admin/crm">← Voltar ao CRM</a>
+  <header><p class="kicker">GERENCIAR</p><h1>Conteúdo da Home</h1><p>Edite os textos principais sem alterar o layout do site.</p></header>
+  @if (loading()) { <p class="status">Carregando conteúdo...</p> }
+  @else {
+    <form (ngSubmit)="save()">
+      <section class="card"><h2>Mídia</h2>
+        <p class="hint">Envie uma imagem (JPG, PNG ou WebP, até 5 MB) para usar no hero ou em um projeto.</p>
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" />
+        <button type="button" class="upload" (click)="upload()" [disabled]="uploading() || !selectedFile">{{ uploading() ? 'Enviando...' : 'Enviar imagem' }}</button>
+        <p class="status" aria-live="polite">{{ uploading() ? 'Enviando imagem...' : '' }}</p>
+        @if (uploadMessage()) { <p class="status success" aria-live="polite">{{ uploadMessage() }}</p> }
+        @if (uploadError()) { <p class="status error" aria-live="polite">{{ uploadError() }}</p> }
+        @if (uploadedUrl()) {
+          <p class="uploaded-url"><a [href]="uploadedUrl()" target="_blank" rel="noopener">{{ uploadedUrl() }}</a></p>
+          <div class="apply">
+            <label for="mediaTarget">Aplicar em
+              <select id="mediaTarget" name="mediaTarget" [(ngModel)]="mediaTarget">
+                <option value="hero">Hero</option>
+                <option value="project">Projeto selecionado</option>
+              </select>
+            </label>
+            @if (mediaTarget === 'project') {
+              <label for="projectSelect">Projeto
+                <select id="projectSelect" name="projectSelect" [(ngModel)]="selectedProjectIndex">
+                  @for (project of content.projects; track $index; let i = $index) {
+                    <option [ngValue]="i">{{ project.title || 'Projeto ' + (i + 1) }}</option>
+                  }
+                </select>
+              </label>
+            }
+            <button type="button" class="apply-btn" (click)="applyUploadedUrl()">Usar esta URL</button>
+          </div>
+        }
+      </section>
+      <section class="card"><h2>Hero</h2>
+        <label for="heroTitle">Título<input id="heroTitle" name="heroTitle" [(ngModel)]="content.heroTitle" required maxlength="240" /></label>
+        <label for="heroText">Texto<textarea id="heroText" name="heroText" [(ngModel)]="content.heroText" required maxlength="1000" rows="4"></textarea></label>
+        <label for="heroImageUrl">Imagem<input id="heroImageUrl" name="heroImageUrl" [(ngModel)]="content.heroImageUrl" required maxlength="500" /></label>
+      </section>
+      <section class="card"><h2>Contato</h2>
+        <label for="contactEmail">E-mail<input id="contactEmail" name="contactEmail" type="email" [(ngModel)]="content.contactEmail" required maxlength="254" /></label>
+        <label for="contactPhone">Telefone<input id="contactPhone" name="contactPhone" [(ngModel)]="content.contactPhone" required maxlength="40" /></label>
+      </section>
+      <section class="card"><h2>Soluções <small>(máximo 4)</small></h2>
+        @for (solution of content.solutions; track $index; let i = $index) {
+          <div class="item">
+            <label [for]="'solutionTitle' + i">Título<input [id]="'solutionTitle' + i" [name]="'solutionTitle' + i" [(ngModel)]="solution.title" required maxlength="80" /></label>
+            <label [for]="'solutionText' + i">Descrição<textarea [id]="'solutionText' + i" [name]="'solutionText' + i" [(ngModel)]="solution.text" required maxlength="240" rows="2"></textarea></label>
+            <button type="button" class="remove" (click)="removeSolution(i)">Remover</button>
+          </div>
+        }
+        <button type="button" class="add" (click)="addSolution()" [disabled]="content.solutions.length >= 4">Adicionar solução</button>
+      </section>
+      <section class="card"><h2>Etapas do processo <small>(máximo 4)</small></h2>
+        @for (step of content.processSteps; track $index; let i = $index) {
+          <div class="item">
+            <label [for]="'stepTitle' + i">Título<input [id]="'stepTitle' + i" [name]="'stepTitle' + i" [(ngModel)]="step.title" required maxlength="80" /></label>
+            <label [for]="'stepText' + i">Descrição<textarea [id]="'stepText' + i" [name]="'stepText' + i" [(ngModel)]="step.text" required maxlength="240" rows="2"></textarea></label>
+            <button type="button" class="remove" (click)="removeStep(i)">Remover</button>
+          </div>
+        }
+        <button type="button" class="add" (click)="addStep()" [disabled]="content.processSteps.length >= 4">Adicionar etapa</button>
+      </section>
+      <section class="card"><h2>Projetos <small>(máximo 4)</small></h2>
+        @for (project of content.projects; track $index; let i = $index) {
+          <div class="item">
+            <label [for]="'projectTitle' + i">Título<input [id]="'projectTitle' + i" [name]="'projectTitle' + i" [(ngModel)]="project.title" required maxlength="160" /></label>
+            <label [for]="'projectCategory' + i">Categoria<input [id]="'projectCategory' + i" [name]="'projectCategory' + i" [(ngModel)]="project.category" required maxlength="80" /></label>
+            <label [for]="'projectPower' + i">Potência<input [id]="'projectPower' + i" [name]="'projectPower' + i" [(ngModel)]="project.power" required maxlength="40" /></label>
+            <label [for]="'projectImage' + i">Imagem<input [id]="'projectImage' + i" [name]="'projectImage' + i" [(ngModel)]="project.imageUrl" required maxlength="500" /></label>
+            <label [for]="'projectAlt' + i">Alt (acessibilidade)<input [id]="'projectAlt' + i" [name]="'projectAlt' + i" [(ngModel)]="project.alt" required maxlength="240" /></label>
+            <button type="button" class="remove" (click)="removeProject(i)">Remover</button>
+          </div>
+        }
+        <button type="button" class="add" (click)="addProject()" [disabled]="content.projects.length >= 4">Adicionar projeto</button>
+      </section>
+      <button type="submit" [disabled]="saving()">{{ saving() ? 'Salvando...' : 'Salvar alterações' }}</button>
+      <p class="status success" aria-live="polite">{{ message() }}</p><p class="status error" aria-live="polite">{{ error() }}</p>
+    </form>
+  }
+</main>

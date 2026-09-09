@@ -1,0 +1,15 @@
+:host { display: block; min-height: 100vh; background: #f5f4ef; color: #17251f; }
+.editor-shell { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+.back-link { color: #53645a; text-decoration: none; }
+header { margin: 40px 0 28px; } .kicker { color: #b4862e; letter-spacing: .16em; font-size: 12px; } h1 { font-size: clamp(34px, 6vw, 60px); margin: 8px 0; } header p { color: #617068; }
+form { display: grid; gap: 18px; } .card { background: #fff; border: 1px solid #dfe4df; border-radius: 18px; padding: 24px; display: grid; gap: 16px; } h2 { margin: 0 0 4px; }
+h2 small { color: #89938f; font-weight: 500; font-size: .8rem; margin-left: .5rem; }
+label { display: grid; gap: 7px; font-weight: 700; } input, textarea, select { border: 1px solid #cbd5ce; border-radius: 10px; padding: 12px; font: inherit; } button { justify-self: start; background: #19382c; color: #fff; border: 0; border-radius: 999px; padding: 13px 22px; font-weight: 700; cursor: pointer; } button:disabled { opacity: .6; cursor: wait; }
+.hint { color: #617068; margin: 0; font-weight: 400; }
+.uploaded-url a { color: #19382c; word-break: break-all; }
+.apply { display: grid; gap: 12px; border-top: 1px dashed #dfe4df; padding-top: 16px; }
+.item { display: grid; gap: 12px; border: 1px solid #dfe4df; border-radius: 12px; padding: 16px; background: #faf9f6; }
+.item .remove { justify-self: end; background: transparent; color: #a63e3e; border: 1px solid #e2b6b6; border-radius: 8px; padding: 8px 14px; font-size: .8rem; }
+.add { background: transparent; color: #19382c; border: 1px dashed #9aa79f; border-radius: 10px; padding: 12px; font-weight: 700; cursor: pointer; }
+.add:disabled { opacity: .5; cursor: not-allowed; }
+.status { color: #617068; } .success { color: #28724b; } .error { color: #a63e3e; }

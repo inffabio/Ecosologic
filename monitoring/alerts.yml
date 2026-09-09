@@ -1,0 +1,34 @@
+groups:
+  - name: ecosologic
+    rules:
+      - alert: ExporterDown
+        expr: up{job=~"node|containers|postgres|api"} == 0 or absent(up{job=~"node|containers|postgres|api"})
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Exporter ou endpoint monitorado indisponível
+
+      - alert: ApiDown
+        expr: probe_success{job="api"} == 0 or absent(probe_success{job="api"})
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: API Ecosologic indisponível
+
+      - alert: PostgresDown
+        expr: pg_up == 0 or absent(pg_up)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: PostgreSQL Ecosologic indisponível
+
+      - alert: HostDiskAlmostFull
+        expr: (node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"}) < 0.15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Menos de 15% de espaço livre no disco raiz

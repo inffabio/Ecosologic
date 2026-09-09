@@ -1,0 +1,6 @@
+@Ecosologic.Api_HostAddress = http://localhost:5157
+
+GET {{Ecosologic.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

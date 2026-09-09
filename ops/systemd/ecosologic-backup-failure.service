@@ -1,0 +1,14 @@
+[Unit]
+Description=Registra falha do backup do Ecosologic no journal
+After=ecosologic-backup.service
+
+[Service]
+Type=oneshot
+# Grava uma mensagem identificavel no journal. A tag `ecosologic-backup-failure`
+# e o marcador `ECOSOLOGIC_BACKUP_FAILED` permitem localizar a falha com:
+#   journalctl -t ecosologic-backup-failure
+#   journalctl | grep ECOSOLOGIC_BACKUP_FAILED
+ExecStart=/usr/bin/logger -p daemon.err -t ecosologic-backup-failure "ECOSOLOGIC_BACKUP_FAILED: ecosologic-backup.service failed (result=${SERVICE_RESULT}, exit_status=${EXIT_STATUS}); see: journalctl -u ecosologic-backup.service"
+
+[Install]
+WantedBy=multi-user.target
