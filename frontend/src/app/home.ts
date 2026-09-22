@@ -6,22 +6,22 @@ import { ContentService, HomeContent } from './content.service';
 import { canAnimate } from './motion';
 
 const FALLBACK: HomeContent = {
-  heroTitle: 'Seu próximo passo para uma energia mais inteligente.',
-  heroText: 'Projetamos sistemas solares com clareza, precisão e acompanhamento próximo, do primeiro cálculo à instalação.',
+  heroTitle: 'Energia solar distribuída para reduzir sua conta e proteger seu consumo futuro.',
+  heroText: 'Venda consultiva, dimensionamento técnico e soluções híbridas com bateria de lítio para casas e empresas que querem economia, autonomia e previsibilidade.',
   heroImageUrl: 'assets/projects/01-solar.jpg',
   contactEmail: 'fabio@ecosologic.com.br',
-  contactPhone: '+55 (21) 99542-4027',
+  contactPhone: '+55 (21) 96584-7684',
   solutions: [
-    { title: 'Residencial', text: 'Mais controle sobre a conta e mais liberdade para sua casa.' },
-    { title: 'Comercial', text: 'Eficiência que protege a margem e valoriza seu negócio.' },
-    { title: 'Industrial', text: 'Performance energética para operações que não podem parar.' },
-    { title: 'Agronegócio', text: 'Energia confiável para produzir com visão de longo prazo.' }
+    { title: 'Residencial', text: 'Reduza a conta de luz e prepare sua casa para carregar, armazenar e consumir melhor.' },
+    { title: 'Comercial', text: 'Transforme energia em previsibilidade financeira para lojas, clínicas, escritórios e galpões.' },
+    { title: 'Industrial', text: 'Projetos de maior porte com análise de demanda, retorno e continuidade operacional.' },
+    { title: 'Agronegócio', text: 'Geração distribuída para bombas, refrigeração, irrigação e rotinas intensivas de consumo.' }
   ],
   processSteps: [
-    { title: 'Diagnóstico', text: 'Entendemos seu consumo, imóvel e objetivo.' },
-    { title: 'Dimensionamento', text: 'Calculamos a solução adequada ao seu perfil.' },
-    { title: 'Proposta clara', text: 'Você recebe números, prazos e condições sem letras miúdas.' },
-    { title: 'Instalação', text: 'Equipe especializada acompanha tudo até a entrega.' }
+    { title: 'Diagnóstico', text: 'Analisamos sua conta de luz, rotina de consumo, telhado e objetivo de economia.' },
+    { title: 'Dimensionamento', text: 'Dimensionamos módulos, inversor, retorno estimado e, quando fizer sentido, bateria de lítio.' },
+    { title: 'Proposta clara', text: 'Apresentamos investimento, payback, equipamentos e próximos passos com clareza.' },
+    { title: 'Instalação', text: 'Cuidamos da implantação e orientamos o acompanhamento da geração depois da entrega.' }
   ],
   projects: [
     { title: 'Instalação residencial completa', category: 'Residencial · RJ', power: '5,5 kWp', imageUrl: 'assets/projects/02-solar.jpg', alt: 'Instalação solar residencial Ecosologic' },

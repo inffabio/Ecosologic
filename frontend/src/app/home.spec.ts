@@ -29,10 +29,15 @@ describe('Home', () => {
     http.expectOne('http://localhost:5157/api/content/home').flush({});
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('energia');
+    expect(compiled.querySelector('h1')?.textContent?.toLowerCase()).toContain('energia');
     const titles = Array.from(compiled.querySelectorAll('.solution-list h3')).map(el => el.textContent);
     expect(titles).toContain('Residencial');
     expect(titles).toContain('Agronegócio');
+    const video = compiled.querySelector('video.hybrid-video') as HTMLVideoElement;
+    expect(video?.getAttribute('src')).toBe('assets/video.mp4');
+    expect(video?.hasAttribute('muted')).toBeTrue();
+    expect(compiled.querySelector('.hybrid h2')?.textContent).toContain('bateria de lítio');
+    expect(compiled.querySelector('.header-cta')?.getAttribute('href')).toContain('5521965847684');
   });
 
   it('renders projects from the content payload', () => {
