@@ -8,7 +8,7 @@ import { canAnimate } from './motion';
 const FALLBACK: HomeContent = {
   heroTitle: 'Energia solar distribuída para reduzir sua conta e proteger seu consumo futuro.',
   heroText: 'Venda consultiva, dimensionamento técnico e soluções híbridas com bateria de lítio para casas e empresas que querem economia, autonomia e previsibilidade.',
-  heroImageUrl: 'assets/projects/01-solar.jpg',
+  heroImageUrl: 'assets/hero-solar-premium.png',
   contactEmail: 'fabio@ecosologic.com.br',
   contactPhone: '+55 (21) 96584-7684',
   solutions: [
@@ -40,6 +40,7 @@ const FALLBACK: HomeContent = {
 export class Home implements AfterViewInit, OnDestroy {
   readonly isScrolled = signal(false);
   readonly formMessage = signal('');
+  readonly selectedBillName = signal('Nenhum arquivo selecionado');
   contact = { name: '', phone: '', message: '' };
   private readonly leads = inject(LeadService);
   private readonly contentService = inject(ContentService);
@@ -96,9 +97,21 @@ export class Home implements AfterViewInit, OnDestroy {
     this.motionContext?.revert();
   }
   pad(n: number) { return n.toString().padStart(2, '0'); }
+  onBillSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    this.selectedBillName.set(file ? file.name : 'Nenhum arquivo selecionado');
+  }
   @HostListener('window:scroll') onScroll() { this.isScrolled.set(window.scrollY > 24); }
   submitContact() {
-    this.leads.create(this.contact).subscribe({
+    const billMessage = this.selectedBillName() !== 'Nenhum arquivo selecionado'
+      ? `${this.contact.message || ''}\nConta de luz selecionada no formulário: ${this.selectedBillName()}`
+      : this.contact.message;
+    const payload = {
+      ...this.contact,
+      message: billMessage
+    };
+    this.leads.create(payload).subscribe({
       next: () => this.formMessage.set(`Obrigado, ${this.contact.name}. Em breve entraremos em contato.`),
       error: () => this.formMessage.set('Não foi possível enviar agora. Fale conosco pelo WhatsApp.')
     });

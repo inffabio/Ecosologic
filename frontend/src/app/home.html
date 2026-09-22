@@ -13,49 +13,46 @@
 
   <main>
     <section class="hero" id="inicio">
+      <img class="hero-bg" [src]="content().heroImageUrl" alt="Sistema de energia solar instalado em residência" />
+      <div class="hero-shade" aria-hidden="true"></div>
       <div class="hero-copy">
-        <p class="eyebrow"><span></span> Energia distribuída premium</p>
+        <p class="eyebrow">Consultoria em energia distribuída</p>
         <h1>{{ content().heroTitle }}</h1>
         <p class="hero-text">{{ content().heroText }}</p>
         <div class="hero-actions">
           <a class="button button-solar" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Falar pelo WhatsApp <span>→</span></a>
-          <a class="button button-ghost" href="#hibrida">Ver solução híbrida</a>
-        </div>
-        <div class="hero-proof" aria-label="Diferenciais comerciais">
-          <article><strong>Solar</strong><span>geração própria dimensionada para seu consumo</span></article>
-          <article><strong>Bateria</strong><span>apoio de lítio para autonomia e continuidade</span></article>
-          <article><strong>RJ</strong><span>atendimento consultivo e acompanhamento próximo</span></article>
+          <a class="button button-glass" href="#hibrida">Ver híbrida com bateria</a>
         </div>
       </div>
-      <div class="hero-visual" aria-label="Projeto de energia solar Ecosologic">
-        <img [src]="content().heroImageUrl" alt="Sistema de energia solar instalado em residência" />
-        <div class="energy-card primary"><span>Conta sob controle</span><strong>previsibilidade</strong></div>
-        <div class="energy-card secondary"><span>Sistema híbrido</span><strong>solar + bateria</strong></div>
-      </div>
+      <aside class="executive-slab" aria-label="Resumo da solução Ecosologic">
+        <span>Diagnóstico comercial</span>
+        <strong>Solar, bateria e retorno estimado em uma proposta clara.</strong>
+        <div><b>01</b><p>Conta de luz e perfil de consumo</p></div>
+        <div><b>02</b><p>Dimensionamento técnico e financeiro</p></div>
+        <div><b>03</b><p>Instalação e acompanhamento</p></div>
+      </aside>
     </section>
 
-    <section class="proof-bar" aria-label="Indicadores de valor">
-      <p><span class="line"></span> Uma solução pensada para quem quer decidir com segurança.</p>
+    <section class="solar-command" aria-label="Posicionamento comercial">
+      <p>Projeto solar com cara de investimento.</p>
       <div><strong>25+</strong><span>anos de vida útil dos módulos</span></div>
-      <div><strong>4</strong><span>etapas claras até a instalação</span></div>
       <div><strong>360°</strong><span>visão técnica e comercial</span></div>
+      <div><strong>RJ</strong><span>atendimento direto com especialista</span></div>
     </section>
 
-    <section class="solutions section-light" id="solucoes">
+    <section class="solutions" id="solucoes">
+      <div class="section-kicker">Soluções por perfil</div>
       <div class="section-heading">
-        <p class="eyebrow dark"><span></span> Soluções sob medida</p>
-        <h2>Energia solar para reduzir custo, ganhar controle e valorizar seu imóvel.</h2>
-        <p>Atendo residências, comércios e operações que precisam transformar consumo elétrico em uma decisão financeira inteligente.</p>
+        <h2>Não é só instalar placa. É desenhar uma estratégia de energia para sua realidade.</h2>
+        <p>Residência, comércio, indústria ou agronegócio: cada projeto começa pelo consumo e termina em uma decisão simples de entender.</p>
       </div>
       <div class="solution-list">
         @for (solution of content().solutions; track $index; let i = $index) {
           <article>
             <span class="solution-number">{{ pad(i + 1) }}</span>
-            <div>
-              <h3>{{ solution.title }}</h3>
-              <p>{{ solution.text }}</p>
-            </div>
-            <span class="arrow">↗</span>
+            <h3>{{ solution.title }}</h3>
+            <p>{{ solution.text }}</p>
+            <a [href]="whatsappUrl()" target="_blank" rel="noreferrer" aria-label="Conversar sobre {{ solution.title }}"><span>→</span></a>
           </article>
         }
       </div>
@@ -63,46 +60,45 @@
 
     <section class="hybrid" id="hibrida">
       <div class="hybrid-copy">
-        <p class="eyebrow"><span></span> Solar + bateria de lítio</p>
-        <h2>Solução híbrida com apoio de bateria de lítio para mais autonomia.</h2>
-        <p>O sistema híbrido combina geração solar, rede elétrica e armazenamento. Na prática, você aproveita melhor a energia gerada, reduz exposição a reajustes e pode manter cargas essenciais com apoio da bateria.</p>
-        <ul>
-          <li><strong>Backup inteligente</strong><span>para momentos críticos e cargas prioritárias.</span></li>
-          <li><strong>Uso otimizado</strong><span>da energia solar produzida durante o dia.</span></li>
-          <li><strong>Projeto consultivo</strong><span>com dimensionamento de consumo, inversor e armazenamento.</span></li>
-        </ul>
+        <span class="section-kicker inverse">Solução híbrida</span>
+        <h2>Solar + bateria de lítio para quando economia e continuidade precisam andar juntas.</h2>
+        <p>O sistema híbrido combina geração fotovoltaica, rede elétrica e armazenamento. Ele permite aproveitar melhor a energia gerada durante o dia e manter cargas essenciais com apoio da bateria.</p>
+        <div class="hybrid-points">
+          <article><strong>Backup seletivo</strong><span>priorize iluminação, internet, refrigeração ou equipamentos críticos.</span></article>
+          <article><strong>Autoconsumo inteligente</strong><span>use mais da própria energia antes de depender da rede.</span></article>
+          <article><strong>Projeto sob medida</strong><span>dimensionamento com consumo, inversor, bateria e objetivo financeiro.</span></article>
+        </div>
       </div>
       <div class="video-frame">
-        <video class="hybrid-video" src="assets/video.mp4" controls muted preload="metadata" poster="assets/projects/01-solar.jpg"></video>
-        <p>Assista à visão geral da solução híbrida.</p>
+        <video class="hybrid-video" src="assets/video.mp4" autoplay muted loop playsinline preload="metadata" poster="assets/projects/01-solar.jpg"></video>
+        <p>Vídeo em looping, sem áudio, apresentando a solução híbrida.</p>
       </div>
     </section>
 
     <section class="process" id="processo">
-      <div class="process-intro">
-        <p class="eyebrow"><span></span> Processo claro</p>
-        <h2>Da análise da conta à sua usina operando.</h2>
-        <p>Você recebe orientação em cada etapa, com números objetivos e proposta sem complicação.</p>
-        <a class="text-link light" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Começar pelo WhatsApp <span>→</span></a>
-      </div>
-      <div class="process-steps">
-        @for (step of content().processSteps; track $index; let i = $index) {
-          <article>
-            <span>{{ pad(i + 1) }}</span>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.text }}</p>
-          </article>
-        }
+      <div class="section-kicker">Método comercial</div>
+      <div class="process-layout">
+        <div>
+          <h2>Você entende o investimento antes de fechar o projeto.</h2>
+          <p>Sem promessa solta: a conversa passa por conta de luz, telhado, consumo, equipamentos e retorno estimado.</p>
+          <a class="text-link" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Começar uma análise <span>→</span></a>
+        </div>
+        <div class="process-steps">
+          @for (step of content().processSteps; track $index; let i = $index) {
+            <article>
+              <span>{{ pad(i + 1) }}</span>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.text }}</p>
+            </article>
+          }
+        </div>
       </div>
     </section>
 
-    <section class="projects section-light" id="projetos">
+    <section class="projects" id="projetos">
       <div class="projects-heading">
-        <div>
-          <p class="eyebrow dark"><span></span> Projetos reais</p>
-          <h2>Instalações que mostram acabamento, escala e confiança.</h2>
-        </div>
-        <a class="text-link dark-link" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Solicitar avaliação <span>→</span></a>
+        <span class="section-kicker">Projetos reais</span>
+        <h2>Imagem real, acabamento real, resultado para o cliente.</h2>
       </div>
       <div class="project-grid">
         @for (project of content().projects; track $index; let i = $index) {
@@ -117,27 +113,28 @@
       </div>
     </section>
 
-    <section class="contact section-light" id="contato">
+    <section class="contact" id="contato">
       <div class="contact-copy">
-        <p class="eyebrow dark"><span></span> Atendimento direto</p>
-        <h2>Me envie sua conta de luz e receba uma análise inicial.</h2>
-        <p>Vamos conversar sobre consumo, telhado, objetivo de economia e possibilidade de solução híbrida com bateria.</p>
-        <div class="contact-details">
-          <a [href]="'mailto:' + content().contactEmail">{{ content().contactEmail }}</a>
-          <a [href]="whatsappUrl()" target="_blank" rel="noreferrer">{{ content().contactPhone }}</a>
-        </div>
+        <span class="section-kicker inverse">Contato direto</span>
+        <h2>Solicite um orçamento para sua energia solar.</h2>
+        <p>Somos uma empresa com centenas de instalações e clientes satisfeitos. Preencha o formulário ou nos chame no WhatsApp para começar sua avaliação.</p>
       </div>
       <form (ngSubmit)="submitContact()" #contactForm="ngForm">
         <label for="name">Seu nome<input id="name" name="name" [(ngModel)]="contact.name" required placeholder="Como posso chamar você?" /></label>
         <label for="phone">WhatsApp<input id="phone" name="phone" [(ngModel)]="contact.phone" required placeholder="(21) 96584-7684" /></label>
-        <label for="message">O que você quer resolver?<textarea id="message" name="message" [(ngModel)]="contact.message" rows="4" placeholder="Quero reduzir minha conta e avaliar bateria... também posso enviar minha conta de luz." ></textarea></label>
-        <button class="button button-dark" type="submit" [disabled]="!contactForm.valid">Enviar solicitação <span>→</span></button>
+        <label for="message">Objetivo<textarea id="message" name="message" [(ngModel)]="contact.message" rows="4" placeholder="Quero reduzir minha conta, avaliar bateria ou entender o retorno do investimento." ></textarea></label>
+        <label class="upload-card" for="bill"><input id="bill" name="bill" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" (change)="onBillSelected($event)" /><span class="upload-icon">+</span><strong>Anexar conta de luz</strong><small>{{ selectedBillName() }}</small></label>
+        <button class="button button-solar" type="submit" [disabled]="!contactForm.valid">Enviar solicitação <span>→</span></button>
         <p class="form-note" aria-live="polite">{{ formMessage() }}</p>
       </form>
     </section>
-  </main>
+    </main>
 
-  <footer>
+    <a class="floating-whatsapp" [href]="whatsappUrl()" target="_blank" rel="noreferrer" title="Contato" aria-label="Contato pelo WhatsApp">
+      <svg aria-hidden="true" viewBox="0 0 32 32"><path d="M16.04 3.2A12.68 12.68 0 0 0 5.18 22.42L3.2 29l6.74-1.92A12.68 12.68 0 1 0 16.04 3.2Zm0 2.25a10.43 10.43 0 0 1 8.86 15.92 10.43 10.43 0 0 1-13.5 3.65l-.48-.24-4 1.14 1.17-3.86-.26-.5A10.43 10.43 0 0 1 16.04 5.45Zm-4.2 5.55c-.23 0-.6.09-.92.43-.32.35-1.2 1.18-1.2 2.87s1.23 3.33 1.4 3.56c.18.23 2.38 3.8 5.9 5.18 2.93 1.15 3.53.92 4.16.86.64-.06 2.06-.84 2.35-1.65.29-.81.29-1.5.2-1.65-.08-.14-.31-.23-.66-.4-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.18-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.18-1.48-.55-2.82-1.74-1.04-.93-1.74-2.08-1.94-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.58-.28-.67-.57-.58-.78-.59h-.66Z" /></svg>
+    </a>
+
+    <footer>
     <img src="assets/brand/logo.png" alt="Ecosologic" />
     <p>Energia distribuída, solar fotovoltaica e soluções híbridas com bateria.</p>
     <span>© 2026 Ecosologic</span>

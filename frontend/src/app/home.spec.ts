@@ -36,8 +36,21 @@ describe('Home', () => {
     const video = compiled.querySelector('video.hybrid-video') as HTMLVideoElement;
     expect(video?.getAttribute('src')).toBe('assets/video.mp4');
     expect(video?.hasAttribute('muted')).toBeTrue();
+    expect(video?.hasAttribute('loop')).toBeTrue();
+    expect(video?.hasAttribute('autoplay')).toBeTrue();
+    expect(video?.hasAttribute('controls')).toBeFalse();
     expect(compiled.querySelector('.hybrid h2')?.textContent).toContain('bateria de lítio');
     expect(compiled.querySelector('.header-cta')?.getAttribute('href')).toContain('5521965847684');
+    const floatingWhatsapp = compiled.querySelector('.floating-whatsapp') as HTMLAnchorElement;
+    expect(floatingWhatsapp?.getAttribute('title')).toBe('Contato');
+    expect(floatingWhatsapp?.getAttribute('href')).toContain('5521965847684');
+    expect(compiled.querySelector('.executive-slab')?.textContent).toContain('Diagnóstico comercial');
+    expect(compiled.querySelector('.solar-command')?.textContent).toContain('Projeto solar com cara de investimento');
+    expect(compiled.querySelector('.upload-card')?.textContent).toContain('Anexar conta de luz');
+    expect(compiled.querySelector('#bill')?.getAttribute('type')).toBe('file');
+    expect(compiled.querySelector('.contact-details')).toBeNull();
+    expect(compiled.querySelector('.contact-copy')?.textContent).toContain('Solicite um orçamento');
+    expect(compiled.querySelector('.contact-copy')?.textContent).toContain('centenas de instalações');
   });
 
   it('renders projects from the content payload', () => {
