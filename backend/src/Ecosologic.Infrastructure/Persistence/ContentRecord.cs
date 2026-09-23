@@ -28,9 +28,28 @@ public static class HomeContentDefaults
 
     public static readonly IReadOnlyList<ProjectItem> Projects = new[]
     {
-        new ProjectItem("Instalação residencial completa", "Residencial · RJ", "5,5 kWp", "assets/projects/02-solar.jpg", "Instalação solar residencial Ecosologic"),
-        new ProjectItem("Módulos solares instalados", "Residencial · RJ", "4,0 kWp", "assets/projects/03-solar.jpg", "Detalhe de módulos solares instalados"),
-        new ProjectItem("Usina em telhado residencial", "Residencial · RJ", "7,0 kWp", "assets/projects/04-solar.jpg", "Sistema fotovoltaico em telhado")
+        new ProjectItem("Instalação solar 1", "Instalação solar", "Projeto fotovoltaico", "assets/projects/1000093004.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 2", "Instalação solar", "Projeto fotovoltaico", "assets/projects/1000093007.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 3", "Instalação solar", "Projeto fotovoltaico", "assets/projects/1000141815.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 4", "Instalação solar", "Projeto fotovoltaico", "assets/projects/dayse-8kw-1000kwh-mes.jpeg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 5", "Instalação solar", "Projeto fotovoltaico", "assets/projects/img-20190603-101900150.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 6", "Instalação solar", "Projeto fotovoltaico", "assets/projects/instalacao-placas-joao-03.jpg", "Instalação de placas solares"),
+        new ProjectItem("Instalação solar 7", "Instalação solar", "Projeto fotovoltaico", "assets/projects/inversor-instalado-joao-6-5kw.jpg", "Inversor solar instalado"),
+        new ProjectItem("Instalação solar 8", "Instalação solar", "Projeto fotovoltaico", "assets/projects/jorge-01-7kw.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 9", "Instalação solar", "Projeto fotovoltaico", "assets/projects/jorge-02.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 10", "Instalação solar", "Projeto fotovoltaico", "assets/projects/lenilson-gd-02.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 11", "Instalação solar", "Projeto fotovoltaico", "assets/projects/ricardo-01-5-5kw.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 12", "Instalação solar", "Projeto fotovoltaico", "assets/projects/ricardo-02.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 13", "Instalação solar", "Projeto fotovoltaico", "assets/projects/sinclar-01-8kw.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 14", "Instalação solar", "Projeto fotovoltaico", "assets/projects/sinclar-03.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 15", "Instalação solar", "Projeto fotovoltaico", "assets/projects/sinclar-06.jpg", "Instalação de energia solar"),
+        new ProjectItem("Instalação solar 16", "Instalação solar", "Projeto fotovoltaico", "assets/projects/telhado-01.jpg", "Sistema solar instalado em telhado"),
+        new ProjectItem("Instalação solar 17", "Instalação solar", "Projeto fotovoltaico", "assets/projects/telhado-02.jpg", "Sistema solar instalado em telhado"),
+        new ProjectItem("Instalação solar 18", "Instalação solar", "Projeto fotovoltaico", "assets/projects/modulos-natalia-02.jpg", "Módulos de energia solar instalados"),
+        new ProjectItem("Instalação solar 19", "Instalação solar", "Projeto fotovoltaico", "assets/projects/modulos-natalia-03.jpg", "Módulos de energia solar instalados"),
+        new ProjectItem("Instalação solar 20", "Instalação solar", "Projeto fotovoltaico", "assets/projects/inversor-01.jpeg", "Inversor de energia solar instalado"),
+        new ProjectItem("Gerador Carla", "Frame de vídeo", "Registro de instalação", "assets/projects/gerador-carla-frame.png", "Frame do vídeo do gerador Carla"),
+        new ProjectItem("Sistema Natalia", "Frame de vídeo", "Registro de instalação", "assets/projects/filmagem-natalia-sistema-frame.png", "Frame do vídeo do sistema Natalia")
     };
 
     public static string Serialize<T>(T value) => JsonSerializer.Serialize(value, JsonOptions);

@@ -62,7 +62,7 @@
         }
         <button type="button" class="add" (click)="addStep()" [disabled]="content.processSteps.length >= 4">Adicionar etapa</button>
       </section>
-      <section class="card"><h2>Projetos <small>(máximo 4)</small></h2>
+       <section class="card"><h2>Projetos <small>(máximo 50)</small></h2>
         @for (project of content.projects; track $index; let i = $index) {
           <div class="item">
             <label [for]="'projectTitle' + i">Título<input [id]="'projectTitle' + i" [name]="'projectTitle' + i" [(ngModel)]="project.title" required maxlength="160" /></label>
@@ -73,7 +73,7 @@
             <button type="button" class="remove" (click)="removeProject(i)">Remover</button>
           </div>
         }
-        <button type="button" class="add" (click)="addProject()" [disabled]="content.projects.length >= 4">Adicionar projeto</button>
+         <button type="button" class="add" (click)="addProject()" [disabled]="content.projects.length >= 50">Adicionar projeto</button>
       </section>
       <button type="submit" [disabled]="saving()">{{ saving() ? 'Salvando...' : 'Salvar alterações' }}</button>
       <p class="status success" aria-live="polite">{{ message() }}</p><p class="status error" aria-live="polite">{{ error() }}</p>

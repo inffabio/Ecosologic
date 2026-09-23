@@ -13,8 +13,13 @@
 
   <main>
     <section class="hero" id="inicio">
-      <img class="hero-bg" [src]="content().heroImageUrl" alt="Sistema de energia solar instalado em residência" />
+      <img class="hero-bg" src="assets/hero-solar-garage-battery.png" alt="Sistema solar com bateria instalado em uma garagem residencial" />
       <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-wave" aria-hidden="true">
+        <svg viewBox="0 0 1600 110" preserveAspectRatio="none">
+          <path fill="#061414" d="M0 58C180 108 360 18 540 58s360-38 540 2 360-30 520 2v48H0Z" />
+        </svg>
+      </div>
       <div class="hero-copy">
         <p class="eyebrow">Consultoria em energia distribuída</p>
         <h1>{{ content().heroTitle }}</h1>
@@ -33,14 +38,15 @@
       </aside>
     </section>
 
-    <section class="solar-command" aria-label="Posicionamento comercial">
-      <p>Projeto solar com cara de investimento.</p>
-      <div><strong>25+</strong><span>anos de vida útil dos módulos</span></div>
-      <div><strong>360°</strong><span>visão técnica e comercial</span></div>
-      <div><strong>RJ</strong><span>atendimento direto com especialista</span></div>
-    </section>
+      <section class="solar-command" data-reveal aria-label="Posicionamento comercial">
+        <p>Projeto solar com cara de investimento.</p>
+        <div><strong>25+</strong><span>anos de vida útil dos módulos</span></div>
+        <div><strong>360°</strong><span>visão técnica e comercial</span></div>
+        <div><strong>RJ</strong><span>atendimento direto com especialista</span></div>
+        <div class="section-wave section-wave--light" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      </section>
 
-    <section class="solutions" id="solucoes">
+    <section class="solutions" data-reveal id="solucoes">
       <div class="section-kicker">Soluções por perfil</div>
       <div class="section-heading">
         <h2>Não é só instalar placa. É desenhar uma estratégia de energia para sua realidade.</h2>
@@ -56,11 +62,11 @@
           </article>
         }
       </div>
+      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
     </section>
 
-    <section class="hybrid" id="hibrida">
+    <section class="hybrid" data-reveal id="hibrida">
       <div class="hybrid-copy">
-        <span class="section-kicker inverse">Solução híbrida</span>
         <h2>Solar + bateria de lítio para quando economia e continuidade precisam andar juntas.</h2>
         <p>O sistema híbrido combina geração fotovoltaica, rede elétrica e armazenamento. Ele permite aproveitar melhor a energia gerada durante o dia e manter cargas essenciais com apoio da bateria.</p>
         <div class="hybrid-points">
@@ -70,12 +76,12 @@
         </div>
       </div>
       <div class="video-frame">
-        <video class="hybrid-video" src="assets/video.mp4" autoplay muted loop playsinline preload="metadata" poster="assets/projects/01-solar.jpg"></video>
-        <p>Vídeo em looping, sem áudio, apresentando a solução híbrida.</p>
+        <video class="hybrid-video" src="assets/video.mp4" autoplay muted loop playsinline preload="metadata" (loadedmetadata)="playVideo($event)" (canplay)="playVideo($event)"></video>
       </div>
+      <div class="section-wave section-wave--light" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
     </section>
 
-    <section class="process" id="processo">
+    <section class="process" data-reveal id="processo">
       <div class="section-kicker">Método comercial</div>
       <div class="process-layout">
         <div>
@@ -93,27 +99,43 @@
           }
         </div>
       </div>
+      <div class="section-wave section-wave--neutral" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
     </section>
 
-    <section class="projects" id="projetos">
+    <section class="projects" data-reveal id="projetos">
       <div class="projects-heading">
         <span class="section-kicker">Projetos reais</span>
         <h2>Imagem real, acabamento real, resultado para o cliente.</h2>
       </div>
-      <div class="project-grid">
-        @for (project of content().projects; track $index; let i = $index) {
-          <figure [class.project-main]="i === 0">
-            <img [src]="project.imageUrl" [alt]="project.alt || project.title" />
-            <figcaption>
-              <strong class="project-title">{{ project.title }}</strong>
-              <div class="project-meta"><span>{{ project.category }}</span><strong>{{ project.power }}</strong></div>
-            </figcaption>
-          </figure>
-        }
+      <div class="project-gallery">
+        <div class="project-thumbnails-wrap">
+          <button class="project-chevron" type="button" (click)="scrollProjects(-1)" aria-label="Rolar projetos para a esquerda">‹</button>
+           <div #projectRail class="project-thumbnails" data-touch-scroll="true" role="list" aria-label="Selecionar projeto"
+             (pointerdown)="startProjectDrag($event)" (pointermove)="moveProjectDrag($event)"
+             (pointerup)="endProjectDrag($event)" (pointercancel)="endProjectDrag($event)">
+            @for (project of content().projects; track $index; let i = $index) {
+              <button class="project-thumbnail" type="button" role="listitem" (click)="openProject(i)" [attr.aria-label]="'Ampliar ' + project.title">
+                <img [src]="project.imageUrl" [alt]="project.alt || project.title" />
+              </button>
+            }
+          </div>
+          <button class="project-chevron" type="button" (click)="scrollProjects(1)" aria-label="Rolar projetos para a direita">›</button>
+        </div>
       </div>
+      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
     </section>
 
-    <section class="contact" id="contato">
+    @if (selectedProject() !== null && content().projects[selectedProject()!]; as project) {
+      <div class="project-lightbox" role="presentation" (click)="closeProject()">
+        <div class="project-lightbox-panel" role="dialog" aria-modal="true" [attr.aria-label]="project.title" (click)="$event.stopPropagation()">
+          <button class="project-lightbox-close" type="button" (click)="closeProject()" aria-label="Fechar imagem">×</button>
+          <img [src]="project.imageUrl" [alt]="project.alt || project.title" />
+          <div class="project-lightbox-caption"><strong>{{ project.title }}</strong><span>{{ project.category }} · {{ project.power }}</span></div>
+        </div>
+      </div>
+    }
+
+    <section class="contact" data-reveal id="contato">
       <div class="contact-copy">
         <span class="section-kicker inverse">Contato direto</span>
         <h2>Solicite um orçamento para sua energia solar.</h2>
@@ -122,11 +144,13 @@
       <form (ngSubmit)="submitContact()" #contactForm="ngForm">
         <label for="name">Seu nome<input id="name" name="name" [(ngModel)]="contact.name" required placeholder="Como posso chamar você?" /></label>
         <label for="phone">WhatsApp<input id="phone" name="phone" [(ngModel)]="contact.phone" required placeholder="(21) 96584-7684" /></label>
+        <label for="email">Seu e-mail<input id="email" name="email" type="email" [(ngModel)]="contact.email" required placeholder="voce@empresa.com" /></label>
         <label for="message">Objetivo<textarea id="message" name="message" [(ngModel)]="contact.message" rows="4" placeholder="Quero reduzir minha conta, avaliar bateria ou entender o retorno do investimento." ></textarea></label>
         <label class="upload-card" for="bill"><input id="bill" name="bill" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" (change)="onBillSelected($event)" /><span class="upload-icon">+</span><strong>Anexar conta de luz</strong><small>{{ selectedBillName() }}</small></label>
         <button class="button button-solar" type="submit" [disabled]="!contactForm.valid">Enviar solicitação <span>→</span></button>
         <p class="form-note" aria-live="polite">{{ formMessage() }}</p>
       </form>
+      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
     </section>
     </main>
 

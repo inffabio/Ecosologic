@@ -35,7 +35,7 @@ export class ContentEditor implements OnInit {
   removeSolution(index: number) { this.content.solutions.splice(index, 1); }
   addStep() { if (this.content.processSteps.length < 4) this.content.processSteps.push({ title: '', text: '' }); }
   removeStep(index: number) { this.content.processSteps.splice(index, 1); }
-  addProject() { if (this.content.projects.length < 4) this.content.projects.push({ title: '', category: '', power: '', imageUrl: '', alt: '' }); }
+  addProject() { if (this.content.projects.length < 50) this.content.projects.push({ title: '', category: '', power: '', imageUrl: '', alt: '' }); }
   removeProject(index: number) { this.content.projects.splice(index, 1); }
 
   save() {

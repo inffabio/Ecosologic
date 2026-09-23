@@ -32,6 +32,14 @@ services:
       Tariffs__SourceUrl: ${TARIFFS_SOURCE_URL:-}
       Tariffs__HttpTimeoutSeconds: ${TARIFFS_HTTP_TIMEOUT_SECONDS:-30}
       Tariffs__MaxRetries: ${TARIFFS_MAX_RETRIES:-3}
+      Email__Enabled: ${EMAIL_ENABLED:-true}
+      Email__SmtpHost: ${EMAIL_SMTP_HOST:-${ALERT_SMTP_HOST:-}}
+      Email__SmtpPort: ${EMAIL_SMTP_PORT:-${ALERT_SMTP_PORT:-587}}
+      Email__SmtpUsername: ${EMAIL_SMTP_USERNAME:-${ALERT_SMTP_USERNAME:-}}
+      Email__SmtpPassword: ${EMAIL_SMTP_PASSWORD:-${ALERT_SMTP_PASSWORD:-}}
+      Email__FromAddress: ${EMAIL_FROM_ADDRESS:-${ALERT_SMTP_FROM:-}}
+      Email__FromName: ${EMAIL_FROM_NAME:-Ecosologic}
+      Email__LeadRecipient: ${EMAIL_LEAD_RECIPIENT:-${ALERT_SMTP_TO:-}}
       ASPNETCORE_ENVIRONMENT: Production
     ports:
       - "127.0.0.1:5157:8080"

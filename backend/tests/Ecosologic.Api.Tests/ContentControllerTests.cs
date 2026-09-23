@@ -57,8 +57,8 @@ public sealed class ContentControllerTests
         Assert.Equal("Residencial", content.Solutions[0].Title);
         Assert.Equal(4, content.ProcessSteps.Count);
         Assert.Equal("Diagnóstico", content.ProcessSteps[0].Title);
-        Assert.Equal(3, content.Projects.Count);
-        Assert.Equal("assets/projects/02-solar.jpg", content.Projects[0].ImageUrl);
+        Assert.Equal(22, content.Projects.Count);
+        Assert.Equal("assets/projects/1000093004.jpg", content.Projects[0].ImageUrl);
     }
 
     [Fact]
@@ -140,15 +140,17 @@ public sealed class ContentControllerTests
     }
 
     [Fact]
-    public async Task Admin_update_rejects_more_than_four_projects()
+    public async Task Admin_update_accepts_fifteen_projects()
     {
         await using var db = NewContext();
-        var projects = Enumerable.Range(1, 5)
-            .Select(i => new ProjectItem($"Projeto {i}", "Categoria", "1 kWp", "img.jpg", "alt")).ToList();
+        var projects = Enumerable.Range(1, 22)
+            .Select(i => new ProjectItem($"Projeto {i}", "Categoria", "1 kWp", $"img-{i}.jpg", "alt")).ToList();
 
         var result = await new ContentController(db).UpdateHome(ValidRequest(projects: projects), CancellationToken.None);
 
-        Assert.IsType<BadRequestObjectResult>(result);
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var content = Assert.IsType<HomeContentResponse>(ok.Value);
+        Assert.Equal(22, content.Projects.Count);
     }
 
     [Fact]
@@ -156,6 +158,32 @@ public sealed class ContentControllerTests
     {
         await using var db = NewContext();
         var projects = new List<ProjectItem> { new("Usina", "Residencial · RJ", "5,5 kWp", "", "") };
+
+        var result = await new ContentController(db).UpdateHome(ValidRequest(projects: projects), CancellationToken.None);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Admin_update_rejects_project_with_null_image()
+    {
+        await using var db = NewContext();
+        var projects = new List<ProjectItem> { new("Usina", "Residencial", "1 kWp", null!, "alt") };
+
+        var result = await new ContentController(db).UpdateHome(ValidRequest(projects: projects), CancellationToken.None);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Admin_update_rejects_duplicate_project_images()
+    {
+        await using var db = NewContext();
+        var projects = new List<ProjectItem>
+        {
+            new("Usina 1", "Residencial", "1 kWp", "same.jpg", "alt 1"),
+            new("Usina 2", "Residencial", "1 kWp", "same.jpg", "alt 2")
+        };
 
         var result = await new ContentController(db).UpdateHome(ValidRequest(projects: projects), CancellationToken.None);
 

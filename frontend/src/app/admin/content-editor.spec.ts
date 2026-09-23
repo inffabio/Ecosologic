@@ -41,15 +41,15 @@ describe('ContentEditor', () => {
     expect(cmp.content.solutions.length).toBe(4);
   });
 
-  it('adds and removes projects up to four', () => {
+  it('adds and removes projects up to fifty', () => {
     const fixture = TestBed.createComponent(ContentEditor);
     const cmp = fixture.componentInstance;
     cmp.content.projects = [];
-    for (let i = 0; i < 4; i++) cmp.addProject();
-    expect(cmp.content.projects.length).toBe(4);
+    for (let i = 0; i < 50; i++) cmp.addProject();
+    expect(cmp.content.projects.length).toBe(50);
     cmp.addProject();
-    expect(cmp.content.projects.length).toBe(4);
+    expect(cmp.content.projects.length).toBe(50);
     cmp.removeProject(1);
-    expect(cmp.content.projects.length).toBe(3);
+    expect(cmp.content.projects.length).toBe(49);
   });
 });

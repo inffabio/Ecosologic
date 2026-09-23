@@ -3,6 +3,7 @@ using Ecosologic.Api.Configuration;
 using Ecosologic.Api.Media;
 using Ecosologic.Api.Security;
 using Ecosologic.Infrastructure.Crm;
+using Ecosologic.Infrastructure.Email;
 using Ecosologic.Infrastructure.Jobs;
 using Ecosologic.Infrastructure.Persistence;
 using Ecosologic.Infrastructure.Solar;
@@ -63,6 +64,8 @@ builder.Services.AddScoped<ICrmNotificationSync>(sp => sp.GetRequiredService<Crm
 builder.Services.AddScoped<TariffCatalog>();
 builder.Services.AddAneelTariffSource();
 builder.Services.AddAneelTariffImport();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddSingleton<ILeadEmailSender, LeadEmailSender>();
 
 var mediaPath = builder.Configuration["Storage:MediaPath"] ?? "wwwroot/uploads";
 var mediaRoot = Path.IsPathRooted(mediaPath) ? mediaPath : Path.Combine(builder.Environment.ContentRootPath, mediaPath);

@@ -41,10 +41,11 @@ public sealed class ContentController(EcosologicDbContext db) : ControllerBase
                 || string.IsNullOrWhiteSpace(item.Text) || item.Text.Length > 240)
             || processSteps.Count > 4 || processSteps.Any(item => string.IsNullOrWhiteSpace(item.Title) || item.Title.Length > 80
                 || string.IsNullOrWhiteSpace(item.Text) || item.Text.Length > 240)
-            || projects.Count > 4 || projects.Any(IsInvalidProject))
+            || projects.Count > 50 || projects.Any(IsInvalidProject)
+            || projects.Select(project => project.ImageUrl?.Trim() ?? string.Empty).Distinct(StringComparer.OrdinalIgnoreCase).Count() != projects.Count)
             return ValidationProblem(new ValidationProblemDetails(new Dictionary<string, string[]>
             {
-                ["content"] = ["Máximo de 4 soluções, 4 etapas e 4 projetos, todos com campos obrigatórios preenchidos."]
+                ["content"] = ["Máximo de 4 soluções, 4 etapas e 50 projetos, todos com campos obrigatórios preenchidos."]
             }));
 
         var content = await GetOrCreate(cancellationToken);
@@ -79,6 +80,16 @@ public sealed class ContentController(EcosologicDbContext db) : ControllerBase
             if (string.IsNullOrWhiteSpace(content.SolutionsJson)) content.SolutionsJson = HomeContentDefaults.SolutionsJson;
             if (string.IsNullOrWhiteSpace(content.ProcessStepsJson)) content.ProcessStepsJson = HomeContentDefaults.ProcessStepsJson;
             if (string.IsNullOrWhiteSpace(content.ProjectsJson)) content.ProjectsJson = HomeContentDefaults.ProjectsJson;
+            var projects = HomeContentDefaults.Deserialize<List<ProjectItem>>(content.ProjectsJson);
+            if (projects is { Count: 3 }
+                && projects.Select(project => project.ImageUrl).SequenceEqual([
+                    "assets/projects/02-solar.jpg",
+                    "assets/projects/03-solar.jpg",
+                    "assets/projects/04-solar.jpg"]))
+            {
+                content.ProjectsJson = HomeContentDefaults.ProjectsJson;
+                await db.SaveChangesAsync(cancellationToken);
+            }
             return content;
         }
 

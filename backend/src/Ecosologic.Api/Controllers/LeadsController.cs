@@ -1,5 +1,7 @@
 using Ecosologic.Domain.Crm;
 using Ecosologic.Infrastructure.Persistence;
+using Ecosologic.Infrastructure.Email;
+using System.Net.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +11,10 @@ namespace Ecosologic.Api.Controllers;
 [ApiController]
 [Route("api/leads")]
 [Authorize(Roles = "Admin")]
-public sealed class LeadsController(EcosologicDbContext db) : ControllerBase
+public sealed class LeadsController(
+    EcosologicDbContext db,
+    ILeadEmailSender? emailSender = null,
+    ILogger<LeadsController>? logger = null) : ControllerBase
 {
     private const int MinDueYear = 1900;
     private const int MaxDueYear = 2200;
@@ -35,6 +40,17 @@ public sealed class LeadsController(EcosologicDbContext db) : ControllerBase
         };
         db.Leads.Add(record);
         await db.SaveChangesAsync(cancellationToken);
+        if (emailSender is not null)
+        {
+            try
+            {
+                await emailSender.SendAsync(record, cancellationToken);
+            }
+            catch (Exception exception) when (exception is SmtpException or InvalidOperationException)
+            {
+                logger?.LogError(exception, "Lead {LeadId} was saved but email delivery failed.", record.Id);
+            }
+        }
         return Created($"api/leads/{record.Id}", new { record.Id, record.Stage, record.CreatedAt });
     }
 

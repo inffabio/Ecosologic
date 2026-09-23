@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonApp } from '@ionic/angular/ion-app';
 import { LeadService } from './lead.service';
@@ -8,7 +8,7 @@ import { canAnimate } from './motion';
 const FALLBACK: HomeContent = {
   heroTitle: 'Energia solar distribuída para reduzir sua conta e proteger seu consumo futuro.',
   heroText: 'Venda consultiva, dimensionamento técnico e soluções híbridas com bateria de lítio para casas e empresas que querem economia, autonomia e previsibilidade.',
-  heroImageUrl: 'assets/hero-solar-premium.png',
+  heroImageUrl: 'assets/hero-solar-garage-system.png',
   contactEmail: 'fabio@ecosologic.com.br',
   contactPhone: '+55 (21) 96584-7684',
   solutions: [
@@ -24,9 +24,28 @@ const FALLBACK: HomeContent = {
     { title: 'Instalação', text: 'Cuidamos da implantação e orientamos o acompanhamento da geração depois da entrega.' }
   ],
   projects: [
-    { title: 'Instalação residencial completa', category: 'Residencial · RJ', power: '5,5 kWp', imageUrl: 'assets/projects/02-solar.jpg', alt: 'Instalação solar residencial Ecosologic' },
-    { title: 'Módulos solares instalados', category: 'Residencial · RJ', power: '4,0 kWp', imageUrl: 'assets/projects/03-solar.jpg', alt: 'Detalhe de módulos solares instalados' },
-    { title: 'Usina em telhado residencial', category: 'Residencial · RJ', power: '7,0 kWp', imageUrl: 'assets/projects/04-solar.jpg', alt: 'Sistema fotovoltaico em telhado' }
+    { title: 'Instalação solar 1', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/1000093004.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 2', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/1000093007.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 3', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/1000141815.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 4', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/dayse-8kw-1000kwh-mes.jpeg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 5', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/img-20190603-101900150.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 6', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/instalacao-placas-joao-03.jpg', alt: 'Instalação de placas solares' },
+    { title: 'Instalação solar 7', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/inversor-instalado-joao-6-5kw.jpg', alt: 'Inversor solar instalado' },
+    { title: 'Instalação solar 8', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/jorge-01-7kw.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 9', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/jorge-02.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 10', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/lenilson-gd-02.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 11', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/ricardo-01-5-5kw.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 12', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/ricardo-02.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 13', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/sinclar-01-8kw.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 14', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/sinclar-03.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 15', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/sinclar-06.jpg', alt: 'Instalação de energia solar' },
+    { title: 'Instalação solar 16', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/telhado-01.jpg', alt: 'Sistema solar instalado em telhado' },
+    { title: 'Instalação solar 17', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/telhado-02.jpg', alt: 'Sistema solar instalado em telhado' },
+    { title: 'Instalação solar 18', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/modulos-natalia-02.jpg', alt: 'Módulos de energia solar instalados' },
+    { title: 'Instalação solar 19', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/modulos-natalia-03.jpg', alt: 'Módulos de energia solar instalados' },
+    { title: 'Instalação solar 20', category: 'Instalação solar', power: 'Projeto fotovoltaico', imageUrl: 'assets/projects/inversor-01.jpeg', alt: 'Inversor de energia solar instalado' },
+    { title: 'Gerador Carla', category: 'Frame de vídeo', power: 'Registro de instalação', imageUrl: 'assets/projects/gerador-carla-frame.png', alt: 'Frame do vídeo do gerador Carla' },
+    { title: 'Sistema Natalia', category: 'Frame de vídeo', power: 'Registro de instalação', imageUrl: 'assets/projects/filmagem-natalia-sistema-frame.png', alt: 'Frame do vídeo do sistema Natalia' }
   ]
 };
 
@@ -41,11 +60,15 @@ export class Home implements AfterViewInit, OnDestroy {
   readonly isScrolled = signal(false);
   readonly formMessage = signal('');
   readonly selectedBillName = signal('Nenhum arquivo selecionado');
-  contact = { name: '', phone: '', message: '' };
+  readonly selectedProject = signal<number | null>(null);
+  @ViewChild('projectRail') private projectRail?: ElementRef<HTMLElement>;
+  contact = { name: '', phone: '', email: '', message: '' };
   private readonly leads = inject(LeadService);
   private readonly contentService = inject(ContentService);
   private motionContext?: { revert: () => void };
   private destroyed = false;
+  private projectDrag?: { startX: number; scrollLeft: number };
+  private suppressProjectClick = false;
   readonly content = signal<HomeContent>({ ...FALLBACK });
   ngOnInit() {
     this.contentService.getPublicHome().subscribe({
@@ -54,9 +77,25 @@ export class Home implements AfterViewInit, OnDestroy {
         ...content,
         solutions: content.solutions?.length ? content.solutions : FALLBACK.solutions,
         processSteps: content.processSteps?.length ? content.processSteps : FALLBACK.processSteps,
-        projects: content.projects?.length ? content.projects : FALLBACK.projects
+       projects: this.uniqueProjects(this.isLegacyProjects(content.projects) ? FALLBACK.projects : content.projects?.length ? content.projects : FALLBACK.projects)
       })
     });
+  }
+  private uniqueProjects(projects: HomeContent['projects']) {
+    const seen = new Set<string>();
+    return projects.filter(project => {
+      const imageUrl = project.imageUrl?.trim().toLowerCase() ?? '';
+      if (seen.has(imageUrl)) return false;
+      seen.add(imageUrl);
+      return true;
+    });
+  }
+  private isLegacyProjects(projects: HomeContent['projects'] | undefined) {
+    return projects?.length === 3 && projects.every(project => [
+      'assets/projects/02-solar.jpg',
+      'assets/projects/03-solar.jpg',
+      'assets/projects/04-solar.jpg'
+    ].includes(project.imageUrl));
   }
   whatsappUrl() {
     return `https://wa.me/${this.content().contactPhone.replace(/\D/g, '')}`;
@@ -73,14 +112,23 @@ export class Home implements AfterViewInit, OnDestroy {
           .from('.hero-visual', { clipPath: 'inset(0 0 0 12%)', opacity: 0, duration: 0.9 }, '<0.1')
           .from('.hero-visual img', { scale: 1.08, duration: 1.1 }, '<');
 
-        gsap.utils.toArray<HTMLElement>('.solution-list article, .process-steps article, .project-grid figure').forEach((item) => {
-          gsap.from(item, {
-            y: 30,
-            opacity: 0,
-            duration: 0.7,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: item, start: 'top 86%', once: true }
-          });
+        gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((section) => {
+          gsap.fromTo(section,
+            { y: 34, opacity: 0.15 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.55,
+              ease: 'power3.out',
+              onStart: () => section.classList.remove('is-revealed'),
+              onComplete: () => section.classList.add('is-revealed'),
+              scrollTrigger: {
+                trigger: section,
+                start: 'top 84%',
+                toggleActions: 'restart none restart none'
+              }
+            }
+          );
         });
 
         gsap.to('.hero-visual img', {
@@ -101,6 +149,45 @@ export class Home implements AfterViewInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     this.selectedBillName.set(file ? file.name : 'Nenhum arquivo selecionado');
+  }
+  scrollProjects(direction: number) {
+    this.projectRail?.nativeElement.scrollBy({ left: direction * 280, behavior: 'smooth' });
+  }
+  startProjectDrag(event: PointerEvent) {
+    const rail = this.projectRail?.nativeElement;
+    if (!rail) return;
+    this.projectDrag = { startX: event.clientX, scrollLeft: rail.scrollLeft };
+  }
+  moveProjectDrag(event: PointerEvent) {
+    const rail = this.projectRail?.nativeElement;
+    if (!rail || !this.projectDrag) return;
+    const delta = event.clientX - this.projectDrag.startX;
+    if (Math.abs(delta) > 4) this.suppressProjectClick = true;
+    rail.scrollLeft = this.projectDrag.scrollLeft - delta;
+  }
+  endProjectDrag(event: PointerEvent) {
+    this.projectDrag = undefined;
+    if (this.suppressProjectClick) setTimeout(() => this.suppressProjectClick = false);
+  }
+  playVideo(event: Event) {
+    const video = event.target as HTMLVideoElement;
+    video.muted = true;
+    void video.play().catch(() => undefined);
+  }
+  openProject(index: number) { if (!this.suppressProjectClick) this.selectedProject.set(index); }
+  closeProject() { this.selectedProject.set(null); }
+  @HostListener('document:keydown', ['$event']) onProjectKeydown(event: KeyboardEvent) {
+    const current = this.selectedProject();
+    if (current === null) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeProject();
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      const projects = this.content().projects;
+      const offset = event.key === 'ArrowRight' ? 1 : -1;
+      this.selectedProject.set((current + offset + projects.length) % projects.length);
+    }
   }
   @HostListener('window:scroll') onScroll() { this.isScrolled.set(window.scrollY > 24); }
   submitContact() {
