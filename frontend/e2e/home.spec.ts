@@ -65,6 +65,14 @@ test('home is usable on a mobile viewport', async ({ page }) => {
 
   const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(hasHorizontalOverflow).toBe(false);
+
+  const offerGeometry = await page.locator('.offer-card').first().evaluate(card => {
+    const copy = card.querySelector('.offer-copy')!.getBoundingClientRect();
+    const inverter = card.querySelector('.microinverter-photo')!.getBoundingClientRect();
+    return { copyBottom: copy.bottom, inverterTop: inverter.top, inverterHeight: inverter.height };
+  });
+  expect(offerGeometry.inverterTop).toBeGreaterThanOrEqual(offerGeometry.copyBottom);
+  expect(offerGeometry.inverterHeight).toBeLessThanOrEqual(120);
 });
 
 test('opens a project image when a thumbnail is clicked', async ({ page }) => {

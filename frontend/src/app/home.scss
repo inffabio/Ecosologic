@@ -1301,7 +1301,8 @@ footer p {
     grid-auto-columns: 86vw;
   }
   .offer-card {
-    min-height: 620px;
+    min-height: 0;
+    padding-bottom: 1.25rem;
   }
   .offer-panel-img {
     position: absolute;
@@ -1322,8 +1323,12 @@ footer p {
     font-size: clamp(1.05rem, 4.5vw, 1.4rem);
   }
   .microinverter-photo {
-    width: 82%;
-    max-height: 145px;
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 52%;
+    max-height: 110px;
+    margin: 0.8rem auto 0;
   }
 }
 .offer-carousel-wrap {
