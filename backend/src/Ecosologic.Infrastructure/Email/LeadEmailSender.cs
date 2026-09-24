@@ -1,4 +1,5 @@
 using System.Net.Mail;
+using System.Reflection;
 using System.Text.Encodings.Web;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,8 @@ public sealed class LeadEmailSender(
     ILogger<LeadEmailSender> logger,
     ISmtpTransportFactory transportFactory) : ILeadEmailSender
 {
-    private const string Logo = "<img src='https://www.ecosologic.com.br/assets/brand/email-logo.png' width='220' height='58' alt='Ecosologic' style='display:block;width:220px;max-width:100%;height:auto;border:0' />";
+    private const string LogoContentId = "ecosologic-logo";
+    private const string Logo = "<img src='cid:ecosologic-logo' width='220' height='58' alt='Ecosologic' style='display:block;width:220px;max-width:100%;height:auto;border:0' />";
 
     public async Task SendAsync(LeadRecord lead, CancellationToken cancellationToken)
     {
@@ -49,9 +51,7 @@ public sealed class LeadEmailSender(
         if (IsValidEmail(lead.Email))
             message.ReplyTo.Add(MailboxAddress.Parse(lead.Email));
 
-        message.Body = new BodyBuilder
-        {
-            HtmlBody = $"""
+        message.Body = BuildBody($"""
                 <!doctype html>
                 <html><body style="margin:0;background:#eef6ed;font-family:Arial,sans-serif;color:#102522">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;background:#eef6ed">
@@ -67,17 +67,14 @@ public sealed class LeadEmailSender(
                     </table></td></tr>
                   </table>
                 </body></html>
-                """
-        }.ToMessageBody();
+                """);
         return message;
     }
 
     private static MimeMessage BuildCustomerMessage(EmailSettings settings, LeadRecord lead)
     {
         var message = NewMessage(settings, lead.Email, "Recebemos sua solicitação | Ecosologic");
-        message.Body = new BodyBuilder
-        {
-            HtmlBody = $"""
+        message.Body = BuildBody($"""
                 <!doctype html>
                 <html><body style="margin:0;background:#eef6ed;font-family:Arial,sans-serif;color:#102522">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;background:#eef6ed">
@@ -93,9 +90,23 @@ public sealed class LeadEmailSender(
                     </table></td></tr>
                   </table>
                 </body></html>
-                """
-        }.ToMessageBody();
+                """);
         return message;
+    }
+
+    private static MimeEntity BuildBody(string html)
+    {
+        var body = new BodyBuilder { HtmlBody = html };
+        using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(
+            "Ecosologic.Infrastructure.Email.EmailAssets.email-logo.png")
+            ?? throw new InvalidOperationException("The email logo resource is missing.");
+        using var logoStream = new MemoryStream();
+        resource.CopyTo(logoStream);
+        logoStream.Position = 0;
+        var logo = body.LinkedResources.Add("email-logo.png", logoStream, ContentType.Parse("image/png"));
+        logo.ContentId = LogoContentId;
+        logo.ContentDisposition = new ContentDisposition(ContentDisposition.Inline);
+        return body.ToMessageBody();
     }
 
     private static MimeMessage NewMessage(EmailSettings settings, string recipient, string subject)

@@ -73,8 +73,9 @@ public sealed class LeadEmailSenderTests
         Assert.Equal(2, transport.Messages.Count);
         Assert.All(transport.Messages, message =>
         {
-            Assert.Contains("https://www.ecosologic.com.br/assets/brand/email-logo.png", message.HtmlBody);
+            Assert.Contains("cid:ecosologic-logo", message.HtmlBody);
             Assert.DoesNotContain("<svg", message.HtmlBody, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(message.BodyParts, part => part.ContentId == "ecosologic-logo");
         });
     }
 
