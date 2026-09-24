@@ -252,6 +252,7 @@ describe('Home', () => {
     cards[0].click();
     fixture.detectChanges();
 
+    expect(fixture.componentInstance.contact.message).toBe('');
     expect(cards[0].classList.contains('is-featured')).toBeTrue();
     expect(cards[1].classList.contains('is-featured')).toBeFalse();
     expect(cards[2].classList.contains('is-featured')).toBeFalse();
