@@ -74,7 +74,7 @@ public sealed class HomeContentRecord
     public string HeroText { get; set; } = "Projetamos sistemas solares com clareza, precisão e acompanhamento próximo, do primeiro cálculo à instalação.";
     public string HeroImageUrl { get; set; } = "assets/projects/01-solar.jpg";
     public string ContactEmail { get; set; } = "fabio@ecosologic.com.br";
-    public string ContactPhone { get; set; } = "+55 (21) 99542-4027";
+    public string ContactPhone { get; set; } = "+55 (21) 96584-7684";
     public string SolutionsJson { get; set; } = HomeContentDefaults.SolutionsJson;
     public string ProcessStepsJson { get; set; } = HomeContentDefaults.ProcessStepsJson;
     public string ProjectsJson { get; set; } = HomeContentDefaults.ProjectsJson;

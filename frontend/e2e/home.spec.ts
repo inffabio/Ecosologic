@@ -58,6 +58,7 @@ test('home is usable on a mobile viewport', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: /Energia solar distribuída/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /WhatsApp/i }).first()).toBeVisible();
+  await expect(page.locator('.site-header .header-cta')).toBeHidden();
   await expect(page.locator('video.hybrid-video')).toBeVisible();
   await expect(page.locator('.project-chevron')).toHaveCount(2);
   await expect(page.locator('.project-chevron').first()).toBeHidden();

@@ -1290,6 +1290,9 @@ footer p {
   }
 }
 @media (max-width: 620px) {
+  .site-header .header-cta {
+    display: none;
+  }
   .offers {
     padding: 4.5rem 1rem;
   }
