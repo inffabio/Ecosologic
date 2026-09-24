@@ -218,4 +218,27 @@ describe('Home', () => {
     expect(home.formatPhone('2133334444')).toBe('(21) 3333-4444');
     expect(home.formatPhone('(21) 99999-9999 ext. 2')).toBe('(21) 99999-9999');
   });
+
+  it('prepares the contact form for the selected promotional kit', () => {
+    const fixture = TestBed.createComponent(Home);
+    const home = fixture.componentInstance;
+
+    home.selectOffer('Kit 1000 kWh/mês com 13 módulos solares 620 Wp');
+
+    expect(home.contact.message).toBe(
+      'Olá, gostaria de solicitar uma avaliação do Kit 1000 kWh/mês com 13 módulos solares 620 Wp.',
+    );
+  });
+
+  it('keeps the 13-module title together in the offer card', () => {
+    const fixture = TestBed.createComponent(Home);
+    fixture.detectChanges();
+    http.expectOne('http://localhost:5157/api/content/home').flush({});
+    fixture.detectChanges();
+
+    const titles = Array.from(
+      fixture.nativeElement.querySelectorAll('.offer-copy h3'),
+    ) as HTMLElement[];
+    expect(titles[2].querySelector('span')?.textContent).toBe('13 módulos solares 620 Wp');
+  });
 });

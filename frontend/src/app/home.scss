@@ -1158,7 +1158,7 @@ footer p {
     linear-gradient(145deg, #060908, #11100d);
   box-shadow: 0 28px 90px #0009;
   scroll-snap-align: start;
-  padding: 1.25rem;
+   padding: 1.5rem;
 }
 .offer-card:before {
   content: '';
@@ -1176,9 +1176,9 @@ footer p {
 }
 .offer-panel-img {
   position: absolute;
-  left: 0.75rem;
+   left: 1rem;
   top: 5.4rem;
-  width: 43%;
+   width: 40%;
   height: 330px;
   object-fit: contain;
   filter: drop-shadow(0 24px 55px #82bedc66);
@@ -1201,9 +1201,14 @@ footer p {
   font: 900 0.9rem Manrope;
 }
 .offer-copy h3 {
-  font: 900 clamp(1.55rem, 3vw, 2.35rem) Manrope;
-  line-height: 1.04;
-  margin: 0;
+   width: calc(100% + 9rem);
+   font: 900 clamp(1.35rem, 2.5vw, 1.95rem) Manrope;
+   line-height: 1.04;
+   margin: 0;
+}
+.offer-copy h3 span,
+.offer-copy strong {
+   white-space: nowrap;
 }
 .offer-copy p {
   color: #ffffffbd;
@@ -1211,8 +1216,8 @@ footer p {
   margin: 0;
 }
 .offer-copy strong {
-  color: #f5c84c;
-  font: 900 clamp(1.9rem, 3.6vw, 2.8rem) Manrope;
+   color: #f5c84c;
+   font: 900 clamp(1.55rem, 2.7vw, 2.15rem) Manrope;
 }
 .offer-copy small {
   color: #ffffff8c;
@@ -1308,6 +1313,10 @@ footer p {
   .offer-copy {
     margin-left: 0;
     padding-top: 285px;
+  }
+  .offer-copy h3 {
+    width: 100%;
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
   }
   .microinverter-photo {
     width: 82%;

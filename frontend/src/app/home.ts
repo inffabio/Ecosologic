@@ -227,6 +227,7 @@ export class Home implements AfterViewInit, OnDestroy {
   readonly formMessage = signal('');
   readonly selectedBillName = signal('Nenhum arquivo selecionado');
   readonly selectedProject = signal<number | null>(null);
+  readonly selectedOffer = signal('800');
   @ViewChild('projectRail') private projectRail?: ElementRef<HTMLElement>;
   @ViewChild('offerRail') private offerRail?: ElementRef<HTMLElement>;
   contact = { name: '', phone: '', email: '', message: '' };
@@ -362,6 +363,12 @@ export class Home implements AfterViewInit, OnDestroy {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
     this.scrollOffers(event.key === 'ArrowRight' ? 1 : -1);
+  }
+  selectOffer(message: string) {
+    const match = message.match(/Kit (600|800|1000)/);
+    if (match) this.selectedOffer.set(match[1]);
+    this.contact.message = `Olá, gostaria de solicitar uma avaliação do ${message}.`;
+    requestAnimationFrame(() => document.getElementById('message')?.focus());
   }
   startProjectDrag(event: PointerEvent) {
     const rail = this.projectRail?.nativeElement;

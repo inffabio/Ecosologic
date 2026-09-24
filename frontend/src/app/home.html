@@ -284,7 +284,7 @@
           (keydown)="onOfferKeydown($event)"
         >
           <li>
-            <article class="offer-card" aria-labelledby="offer-title-600">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '600'" aria-labelledby="offer-title-600">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -293,7 +293,7 @@
               <div class="offer-copy">
                 <span class="offer-tag">SUPER OFERTA</span
                 ><span class="offer-consumption">600 kWh/mês</span>
-                <h3 id="offer-title-600">8 módulos solares 620 Wp</h3>
+                <h3 id="offer-title-600"><span>8 módulos solares 620 Wp</span></h3>
                 <p>
                   2 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
@@ -301,7 +301,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 600 kWh/mês com 8 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"
@@ -311,7 +311,7 @@
             </article>
           </li>
           <li>
-            <article class="offer-card is-featured" aria-labelledby="offer-title-800">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '800'" aria-labelledby="offer-title-800">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -320,7 +320,7 @@
               <div class="offer-copy">
                 <span class="offer-tag">SUPER OFERTA</span
                 ><span class="offer-consumption">800 kWh/mês</span>
-                <h3 id="offer-title-800">11 módulos solares 620 Wp</h3>
+                <h3 id="offer-title-800"><span>11 módulos solares 620 Wp</span></h3>
                 <p>
                   3 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
@@ -328,7 +328,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 800 kWh/mês com 11 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"
@@ -338,7 +338,7 @@
             </article>
           </li>
           <li>
-            <article class="offer-card" aria-labelledby="offer-title-1000">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '1000'" aria-labelledby="offer-title-1000">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -347,7 +347,7 @@
               <div class="offer-copy">
                 <span class="offer-tag">SUPER OFERTA</span
                 ><span class="offer-consumption">1000 kWh/mês</span>
-                <h3 id="offer-title-1000">13 módulos solares 620 Wp</h3>
+                <h3 id="offer-title-1000"><span>13 módulos solares 620 Wp</span></h3>
                 <p>
                   4 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
@@ -355,7 +355,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 1000 kWh/mês com 13 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"
