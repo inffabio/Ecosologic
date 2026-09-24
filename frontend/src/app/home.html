@@ -284,7 +284,7 @@
           (keydown)="onOfferKeydown($event)"
         >
           <li>
-            <article class="offer-card" [class.is-featured]="selectedOffer() === '600'" aria-labelledby="offer-title-600">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '600'" aria-labelledby="offer-title-600" (click)="selectOffer('600', 'Kit 600 kWh/mês com 8 módulos solares 620 Wp')">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -301,7 +301,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 600 kWh/mês com 8 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"
@@ -311,7 +311,7 @@
             </article>
           </li>
           <li>
-            <article class="offer-card" [class.is-featured]="selectedOffer() === '800'" aria-labelledby="offer-title-800">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '800'" aria-labelledby="offer-title-800" (click)="selectOffer('800', 'Kit 800 kWh/mês com 11 módulos solares 620 Wp')">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -328,7 +328,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 800 kWh/mês com 11 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"
@@ -338,7 +338,7 @@
             </article>
           </li>
           <li>
-            <article class="offer-card" [class.is-featured]="selectedOffer() === '1000'" aria-labelledby="offer-title-1000">
+            <article class="offer-card" [class.is-featured]="selectedOffer() === '1000'" aria-labelledby="offer-title-1000" (click)="selectOffer('1000', 'Kit 1000 kWh/mês com 13 módulos solares 620 Wp')">
               <img
                 class="offer-panel-img"
                 src="assets/offers/modulo-solar.png"
@@ -355,7 +355,7 @@
                 ><small
                   ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
                   Homologação.</small
-                ><a class="offer-cta" href="#contato" (click)="selectOffer('Kit 1000 kWh/mês com 13 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
               </div>
               <img
                 class="microinverter-photo"

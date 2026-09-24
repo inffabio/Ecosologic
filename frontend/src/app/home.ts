@@ -364,9 +364,8 @@ export class Home implements AfterViewInit, OnDestroy {
     event.preventDefault();
     this.scrollOffers(event.key === 'ArrowRight' ? 1 : -1);
   }
-  selectOffer(message: string) {
-    const match = message.match(/Kit (600|800|1000)/);
-    if (match) this.selectedOffer.set(match[1]);
+  selectOffer(id: string, message: string) {
+    this.selectedOffer.set(id);
     this.contact.message = `Olá, gostaria de solicitar uma avaliação do ${message}.`;
     requestAnimationFrame(() => document.getElementById('message')?.focus());
   }

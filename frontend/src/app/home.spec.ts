@@ -223,7 +223,7 @@ describe('Home', () => {
     const fixture = TestBed.createComponent(Home);
     const home = fixture.componentInstance;
 
-    home.selectOffer('Kit 1000 kWh/mês com 13 módulos solares 620 Wp');
+    home.selectOffer('1000', 'Kit 1000 kWh/mês com 13 módulos solares 620 Wp');
 
     expect(home.contact.message).toBe(
       'Olá, gostaria de solicitar uma avaliação do Kit 1000 kWh/mês com 13 módulos solares 620 Wp.',
@@ -240,5 +240,26 @@ describe('Home', () => {
       fixture.nativeElement.querySelectorAll('.offer-copy h3'),
     ) as HTMLElement[];
     expect(titles[2].querySelector('span')?.textContent).toBe('13 módulos solares 620 Wp');
+  });
+
+  it('moves the yellow highlight to the promotional kit card that is clicked', () => {
+    const fixture = TestBed.createComponent(Home);
+    fixture.detectChanges();
+    http.expectOne('http://localhost:5157/api/content/home').flush({});
+    fixture.detectChanges();
+
+    const cards = fixture.nativeElement.querySelectorAll('.offer-card') as NodeListOf<HTMLElement>;
+    cards[0].click();
+    fixture.detectChanges();
+
+    expect(cards[0].classList.contains('is-featured')).toBeTrue();
+    expect(cards[1].classList.contains('is-featured')).toBeFalse();
+    expect(cards[2].classList.contains('is-featured')).toBeFalse();
+
+    cards[2].click();
+    fixture.detectChanges();
+
+    expect(cards[0].classList.contains('is-featured')).toBeFalse();
+    expect(cards[2].classList.contains('is-featured')).toBeTrue();
   });
 });
