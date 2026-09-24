@@ -390,17 +390,18 @@
           formulário ou nos chame no WhatsApp para começar sua avaliação.
         </p>
       </div>
-      <form (ngSubmit)="submitContact()" #contactForm="ngForm">
+      <form (ngSubmit)="submitContact(contactForm)" #contactForm="ngForm">
         <label for="name"
-          >Seu nome<input
+          ><span>Seu nome <b aria-hidden="true">*</b></span><input
             id="name"
             name="name"
             [(ngModel)]="contact.name"
             required
             placeholder="Como posso chamar você?"
-        /></label>
+            [class.field-invalid]="contactForm.submitted && !contact.name.trim()"
+          />@if (contactForm.submitted && !contact.name.trim()) {<small class="field-error">Este campo é obrigatório.</small>}</label>
         <label for="phone"
-          >WhatsApp<input
+          ><span>WhatsApp <b aria-hidden="true">*</b></span><input
             id="phone"
             name="phone"
             type="tel"
@@ -409,36 +410,41 @@
             (ngModelChange)="contact.phone = formatPhone($event)"
             required
             placeholder="(21) 96584-7684"
-        /></label>
+            [class.field-invalid]="contactForm.submitted && !contact.phone.trim()"
+          />@if (contactForm.submitted && !contact.phone.trim()) {<small class="field-error">Este campo é obrigatório.</small>}</label>
         <label for="email"
-          >Seu e-mail<input
+          ><span>Seu e-mail <b aria-hidden="true">*</b></span><input
             id="email"
             name="email"
             type="email"
             [(ngModel)]="contact.email"
             required
             placeholder="voce@empresa.com"
-        /></label>
+            [class.field-invalid]="contactForm.submitted && !contact.email.trim()"
+          />@if (contactForm.submitted && !contact.email.trim()) {<small class="field-error">Este campo é obrigatório.</small>}</label>
         <label for="message"
-          >Objetivo<textarea
+          ><span>Objetivo <b aria-hidden="true">*</b></span><textarea
             id="message"
             name="message"
             [(ngModel)]="contact.message"
             rows="4"
             placeholder="Quero reduzir minha conta, avaliar bateria ou entender o retorno do investimento."
-          ></textarea>
+            required
+            [class.field-invalid]="contactForm.submitted && !contact.message.trim()"
+          ></textarea>@if (contactForm.submitted && !contact.message.trim()) {<small class="field-error">Este campo é obrigatório.</small>}
         </label>
-        <label class="upload-card" for="bill"
+        <label class="upload-card" [class.field-invalid]="contactForm.submitted && selectedBillName() === 'Nenhum arquivo selecionado'" for="bill"
           ><input
             id="bill"
             name="bill"
             type="file"
             accept=".pdf,.jpg,.jpeg,.png,.webp"
+            required
             (change)="onBillSelected($event)"
-          /><span class="upload-icon">+</span><strong>Anexar conta de luz</strong
-          ><small>{{ selectedBillName() }}</small></label
+          /><span class="upload-icon">+</span><strong>Anexar conta de luz <b aria-hidden="true">*</b></strong
+          ><small>{{ selectedBillName() }}</small>@if (contactForm.submitted && selectedBillName() === 'Nenhum arquivo selecionado') {<small class="field-error">Este campo é obrigatório.</small>}</label
         >
-        <button class="button button-solar" type="submit" [disabled]="!contactForm.valid">
+        <button class="button button-solar" type="submit">
           Enviar solicitação <span>→</span>
         </button>
         <p class="form-note" aria-live="polite">{{ formMessage() }}</p>

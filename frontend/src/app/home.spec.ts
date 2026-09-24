@@ -219,6 +219,21 @@ describe('Home', () => {
     expect(home.formatPhone('(21) 99999-9999 ext. 2')).toBe('(21) 99999-9999');
   });
 
+  it('shows required errors for every empty contact field after submit', () => {
+    const fixture = TestBed.createComponent(Home);
+    fixture.detectChanges();
+    http.expectOne('http://localhost:5157/api/content/home').flush({});
+    fixture.detectChanges();
+
+    const form = fixture.nativeElement.querySelector('.contact form') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(form.querySelectorAll('.field-error').length).toBe(5);
+    expect(form.querySelectorAll('.field-invalid').length).toBe(5);
+    expect(form.textContent).toContain('Este campo é obrigatório.');
+  });
+
   it('prepares the contact form for the selected promotional kit', () => {
     const fixture = TestBed.createComponent(Home);
     const home = fixture.componentInstance;

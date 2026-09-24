@@ -8,7 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { IonApp } from '@ionic/angular/ion-app';
 import { LeadService } from './lead.service';
 import { ContentService, HomeContent } from './content.service';
@@ -448,7 +448,9 @@ export class Home implements AfterViewInit, OnDestroy {
   @HostListener('window:scroll') onScroll() {
     this.isScrolled.set(window.scrollY > 24);
   }
-  submitContact() {
+  submitContact(form: NgForm) {
+    form.form.markAllAsTouched();
+    if (!form.valid || this.selectedBillName() === 'Nenhum arquivo selecionado') return;
     const billMessage =
       this.selectedBillName() !== 'Nenhum arquivo selecionado'
         ? `${this.contact.message || ''}\nConta de luz selecionada no formulário: ${this.selectedBillName()}`
