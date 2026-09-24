@@ -227,7 +227,7 @@ export class Home implements AfterViewInit, OnDestroy {
   readonly formMessage = signal('');
   readonly selectedBillName = signal('Nenhum arquivo selecionado');
   readonly selectedProject = signal<number | null>(null);
-  readonly selectedOffer = signal('800');
+  readonly selectedOffer = signal('600');
   @ViewChild('projectRail') private projectRail?: ElementRef<HTMLElement>;
   @ViewChild('offerRail') private offerRail?: ElementRef<HTMLElement>;
   contact = { name: '', phone: '', email: '', message: '' };
@@ -360,6 +360,19 @@ export class Home implements AfterViewInit, OnDestroy {
   }
   scrollOffers(direction: number) {
     this.offerRail?.nativeElement.scrollBy({ left: direction * 360, behavior: 'smooth' });
+  }
+  onOfferScroll() {
+    const rail = this.offerRail?.nativeElement;
+    if (!rail) return;
+    const cards = Array.from(rail.querySelectorAll<HTMLElement>('.offer-card'));
+    if (!cards.length) return;
+    const railLeft = rail.getBoundingClientRect().left;
+    const activeIndex = cards.reduce((closest, card, index) => {
+      const distance = Math.abs(card.getBoundingClientRect().left - railLeft);
+      const closestDistance = Math.abs(cards[closest].getBoundingClientRect().left - railLeft);
+      return distance < closestDistance ? index : closest;
+    }, 0);
+    this.selectedOffer.set(['600', '800', '1000'][activeIndex] ?? '600');
   }
   startOfferDrag(event: PointerEvent) {
     const rail = this.offerRail?.nativeElement;

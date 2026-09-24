@@ -99,7 +99,8 @@ test('home is usable on a mobile viewport', async ({ page }) => {
   expect(offerGeometry.inverterHeight).toBeGreaterThanOrEqual(130);
   expect(offerGeometry.headingTop).toBeGreaterThanOrEqual(offerGeometry.panelBottom - 4);
   expect(offerGeometry.copyBottom).toBeLessThanOrEqual(offerGeometry.cardTop + offerGeometry.cardHeight + 1);
-  expect(offerGeometry.cardHeight).toBeGreaterThanOrEqual(700);
+  expect(offerGeometry.cardHeight).toBeGreaterThanOrEqual(650);
+  expect(offerGeometry.cardHeight).toBeLessThanOrEqual(700);
 
   const firstOffer = page.locator('.offer-card').first();
   const offerRail = page.locator('.offer-carousel');
@@ -109,6 +110,14 @@ test('home is usable on a mobile viewport', async ({ page }) => {
   await offerRail.dispatchEvent('pointerup', { clientX: 140, pointerId: 1, pointerType: 'touch' });
   await expect(firstOffer).toHaveClass(/is-featured/);
   await expect(page.locator('.offer-card').nth(1)).not.toHaveClass(/is-featured/);
+
+  await offerRail.evaluate(rail => {
+    rail.scrollLeft = rail.clientWidth;
+    rail.dispatchEvent(new Event('scroll'));
+  });
+  await expect(page.locator('.offer-card').nth(1)).toHaveClass(/is-featured/);
+  await expect(firstOffer).not.toHaveClass(/is-featured/);
+  await expect(page.locator('.offer-copy small').first()).toHaveText('Projeto, Instalação e Homologação.');
 });
 
 test('opens a project image when a thumbnail is clicked', async ({ page }) => {

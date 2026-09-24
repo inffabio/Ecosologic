@@ -196,7 +196,7 @@ describe('Home', () => {
       'Monitoramento de cada módulo',
     );
     expect(compiled.querySelector('.offers')?.textContent).toContain('SUPER OFERTA');
-    expect(compiled.querySelector('.offers')?.textContent).toContain('Além do equipamento');
+    expect(compiled.querySelector('.offers')?.textContent).toContain('Projeto, Instalação e Homologação');
     expect(compiled.querySelectorAll('.offer-cta').length).toBe(3);
     expect(compiled.querySelector('.offer-carousel')?.getAttribute('tabindex')).toBe('0');
     expect(compiled.querySelector('.offer-carousel')?.getAttribute('aria-label')).toContain('Ofertas');

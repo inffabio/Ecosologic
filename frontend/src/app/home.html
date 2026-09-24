@@ -286,6 +286,7 @@
           (pointermove)="moveOfferDrag($event)"
           (pointerup)="endOfferDrag()"
           (pointercancel)="endOfferDrag()"
+          (scroll)="onOfferScroll()"
         >
           <li>
             <article class="offer-card" [class.is-featured]="selectedOffer() === '600'" aria-labelledby="offer-title-600" (click)="highlightOffer('600')">
@@ -302,9 +303,7 @@
                   2 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
                 <strong>R$ 10.752,89</strong
-                ><small
-                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
-                  Homologação.</small
+                ><small>Projeto, Instalação e Homologação.</small
                 ><a class="offer-cta" href="#contato" (click)="selectOffer('600', 'Kit 600 kWh/mês com 8 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
@@ -329,9 +328,7 @@
                   3 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
                 <strong>R$ 14.694,65</strong
-                ><small
-                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
-                  Homologação.</small
+                ><small>Projeto, Instalação e Homologação.</small
                 ><a class="offer-cta" href="#contato" (click)="selectOffer('800', 'Kit 800 kWh/mês com 11 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
@@ -356,9 +353,7 @@
                   4 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
                 </p>
                 <strong>R$ 18.354,00</strong
-                ><small
-                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
-                  Homologação.</small
+                ><small>Projeto, Instalação e Homologação.</small
                 ><a class="offer-cta" href="#contato" (click)="selectOffer('1000', 'Kit 1000 kWh/mês com 13 módulos solares 620 Wp')">Solicitar avaliação <span>→</span></a>
               </div>
               <img
