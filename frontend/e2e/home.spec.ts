@@ -72,9 +72,11 @@ test('home is usable on a mobile viewport', async ({ page }) => {
     const inverter = card.querySelector('.microinverter-photo')!.getBoundingClientRect();
     const tag = card.querySelector('.offer-tag')!.getBoundingClientRect();
     const panel = card.querySelector('.offer-panel-img')!.getBoundingClientRect();
+    const heading = card.querySelector('h3')!.getBoundingClientRect();
     const cardRect = card.getBoundingClientRect();
     return {
       copyBottom: copy.bottom,
+      headingTop: heading.top,
       inverterTop: inverter.top,
       inverterHeight: inverter.height,
       tagBottom: tag.bottom,
@@ -95,6 +97,7 @@ test('home is usable on a mobile viewport', async ({ page }) => {
   expect(offerGeometry.inverterLeft).toBeGreaterThan(offerGeometry.panelLeft);
   expect(offerGeometry.inverterRight).toBeGreaterThan(offerGeometry.panelRight - 24);
   expect(offerGeometry.inverterHeight).toBeGreaterThanOrEqual(130);
+  expect(offerGeometry.headingTop).toBeGreaterThanOrEqual(offerGeometry.panelBottom - 4);
   expect(offerGeometry.copyBottom).toBeLessThanOrEqual(offerGeometry.cardTop + offerGeometry.cardHeight + 1);
   expect(offerGeometry.cardHeight).toBeGreaterThanOrEqual(700);
 
