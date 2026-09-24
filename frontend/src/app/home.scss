@@ -1309,29 +1309,36 @@ footer p {
   }
   .offer-panel-img {
     position: absolute;
-    left: 0.75rem;
-    top: 5.4rem;
-    width: 43%;
-    height: 330px;
+    left: 0.5rem;
+    top: 4.5rem;
+    width: 54%;
+    height: 280px;
     object-fit: contain;
     filter: drop-shadow(0 24px 55px #82bedc66);
     transform: perspective(800px) rotateY(-10deg) rotateZ(-3deg);
   }
   .offer-copy {
     margin-left: 0;
-    padding-top: 285px;
+    padding-top: 230px;
+  }
+  .offer-tag {
+    position: absolute;
+    top: 1rem;
+    right: 0.25rem;
   }
   .offer-copy h3 {
     width: 100%;
     font-size: clamp(1.05rem, 4.5vw, 1.4rem);
   }
   .microinverter-photo {
-    position: relative;
+    position: absolute;
+    right: 0.75rem;
     left: auto;
+    top: 8rem;
     bottom: auto;
-    width: 52%;
-    max-height: 110px;
-    margin: 0.8rem auto 0;
+    width: 35%;
+    max-height: 105px;
+    margin: 0;
   }
 }
 .offer-carousel-wrap {

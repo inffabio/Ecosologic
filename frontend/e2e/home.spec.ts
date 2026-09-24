@@ -70,10 +70,26 @@ test('home is usable on a mobile viewport', async ({ page }) => {
   const offerGeometry = await page.locator('.offer-card').first().evaluate(card => {
     const copy = card.querySelector('.offer-copy')!.getBoundingClientRect();
     const inverter = card.querySelector('.microinverter-photo')!.getBoundingClientRect();
-    return { copyBottom: copy.bottom, inverterTop: inverter.top, inverterHeight: inverter.height };
+    const tag = card.querySelector('.offer-tag')!.getBoundingClientRect();
+    const panel = card.querySelector('.offer-panel-img')!.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    return {
+      copyBottom: copy.bottom,
+      inverterTop: inverter.top,
+      inverterHeight: inverter.height,
+      tagBottom: tag.bottom,
+      panelTop: panel.top,
+      panelBottom: panel.bottom,
+      inverterLeft: inverter.left,
+      panelRight: panel.right,
+      cardHeight: cardRect.height
+    };
   });
-  expect(offerGeometry.inverterTop).toBeGreaterThanOrEqual(offerGeometry.copyBottom);
+  expect(offerGeometry.tagBottom).toBeLessThanOrEqual(offerGeometry.panelTop + 12);
+  expect(offerGeometry.inverterTop).toBeLessThan(offerGeometry.panelBottom);
+  expect(offerGeometry.inverterLeft).toBeGreaterThan(offerGeometry.panelRight - 12);
   expect(offerGeometry.inverterHeight).toBeLessThanOrEqual(120);
+  expect(offerGeometry.cardHeight).toBeLessThan(700);
 });
 
 test('opens a project image when a thumbnail is clicked', async ({ page }) => {
