@@ -282,6 +282,10 @@
           tabindex="0"
           aria-label="Ofertas promocionais de energia solar"
           (keydown)="onOfferKeydown($event)"
+          (pointerdown)="startOfferDrag($event)"
+          (pointermove)="moveOfferDrag($event)"
+          (pointerup)="endOfferDrag()"
+          (pointercancel)="endOfferDrag()"
         >
           <li>
             <article class="offer-card" [class.is-featured]="selectedOffer() === '600'" aria-labelledby="offer-title-600" (click)="highlightOffer('600')">

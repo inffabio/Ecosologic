@@ -1304,7 +1304,7 @@ footer p {
     grid-auto-columns: 86vw;
   }
   .offer-card {
-    min-height: 0;
+    min-height: 780px;
     padding-bottom: 1.25rem;
   }
   .offer-panel-img {
@@ -1319,7 +1319,7 @@ footer p {
   }
   .offer-copy {
     margin-left: 0;
-    padding-top: 230px;
+    padding-top: 360px;
   }
   .offer-tag {
     position: absolute;
@@ -1334,10 +1334,11 @@ footer p {
     position: absolute;
     right: 0.75rem;
     left: auto;
-    top: 8rem;
+    top: 12rem;
     bottom: auto;
-    width: 35%;
-    max-height: 105px;
+    width: 55%;
+    height: 150px;
+    max-height: none;
     margin: 0;
   }
 }

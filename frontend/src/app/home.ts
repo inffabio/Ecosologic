@@ -237,6 +237,8 @@ export class Home implements AfterViewInit, OnDestroy {
   private destroyed = false;
   private projectDrag?: { startX: number; scrollLeft: number };
   private suppressProjectClick = false;
+  private offerDrag?: { startX: number; scrollLeft: number };
+  private suppressOfferClick = false;
   readonly content = signal<HomeContent>({ ...FALLBACK });
   ngOnInit() {
     this.contentService.getPublicHome().subscribe({
@@ -359,12 +361,30 @@ export class Home implements AfterViewInit, OnDestroy {
   scrollOffers(direction: number) {
     this.offerRail?.nativeElement.scrollBy({ left: direction * 360, behavior: 'smooth' });
   }
+  startOfferDrag(event: PointerEvent) {
+    const rail = this.offerRail?.nativeElement;
+    if (!rail) return;
+    this.offerDrag = { startX: event.clientX, scrollLeft: rail.scrollLeft };
+  }
+  moveOfferDrag(event: PointerEvent) {
+    const rail = this.offerRail?.nativeElement;
+    if (!rail || !this.offerDrag) return;
+    const delta = event.clientX - this.offerDrag.startX;
+    if (Math.abs(delta) <= 4) return;
+    this.suppressOfferClick = true;
+    rail.scrollLeft = this.offerDrag.scrollLeft - delta;
+  }
+  endOfferDrag() {
+    this.offerDrag = undefined;
+    if (this.suppressOfferClick) setTimeout(() => (this.suppressOfferClick = false));
+  }
   onOfferKeydown(event: KeyboardEvent) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
     this.scrollOffers(event.key === 'ArrowRight' ? 1 : -1);
   }
   highlightOffer(id: string) {
+    if (this.suppressOfferClick) return;
     this.selectedOffer.set(id);
   }
   selectOffer(id: string, message: string) {

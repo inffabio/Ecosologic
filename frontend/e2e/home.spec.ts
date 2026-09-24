@@ -81,15 +81,31 @@ test('home is usable on a mobile viewport', async ({ page }) => {
       panelTop: panel.top,
       panelBottom: panel.bottom,
       inverterLeft: inverter.left,
+      inverterBottom: inverter.bottom,
+      inverterRight: inverter.right,
+      panelLeft: panel.left,
       panelRight: panel.right,
-      cardHeight: cardRect.height
+      cardHeight: cardRect.height,
+      cardTop: cardRect.top
     };
   });
   expect(offerGeometry.tagBottom).toBeLessThanOrEqual(offerGeometry.panelTop + 12);
-  expect(offerGeometry.inverterTop).toBeLessThan(offerGeometry.panelBottom);
-  expect(offerGeometry.inverterLeft).toBeGreaterThan(offerGeometry.panelRight - 12);
-  expect(offerGeometry.inverterHeight).toBeLessThanOrEqual(120);
-  expect(offerGeometry.cardHeight).toBeLessThan(700);
+  expect(offerGeometry.inverterTop).toBeGreaterThan(offerGeometry.panelTop + 24);
+  expect(offerGeometry.inverterBottom).toBeGreaterThan(offerGeometry.panelTop);
+  expect(offerGeometry.inverterLeft).toBeGreaterThan(offerGeometry.panelLeft);
+  expect(offerGeometry.inverterRight).toBeGreaterThan(offerGeometry.panelRight - 24);
+  expect(offerGeometry.inverterHeight).toBeGreaterThanOrEqual(130);
+  expect(offerGeometry.copyBottom).toBeLessThanOrEqual(offerGeometry.cardTop + offerGeometry.cardHeight + 1);
+  expect(offerGeometry.cardHeight).toBeGreaterThanOrEqual(700);
+
+  const firstOffer = page.locator('.offer-card').first();
+  const offerRail = page.locator('.offer-carousel');
+  await firstOffer.click();
+  await offerRail.dispatchEvent('pointerdown', { clientX: 340, pointerId: 1, pointerType: 'touch' });
+  await offerRail.dispatchEvent('pointermove', { clientX: 140, pointerId: 1, pointerType: 'touch' });
+  await offerRail.dispatchEvent('pointerup', { clientX: 140, pointerId: 1, pointerType: 'touch' });
+  await expect(firstOffer).toHaveClass(/is-featured/);
+  await expect(page.locator('.offer-card').nth(1)).not.toHaveClass(/is-featured/);
 });
 
 test('opens a project image when a thumbnail is clicked', async ({ page }) => {
