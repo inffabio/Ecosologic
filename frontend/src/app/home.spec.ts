@@ -240,6 +240,7 @@ describe('Home', () => {
       fixture.nativeElement.querySelectorAll('.offer-copy h3'),
     ) as HTMLElement[];
     expect(titles[2].querySelector('span')?.textContent).toBe('13 módulos solares 620 Wp');
+    expect(titles[2].querySelector('.offer-power')?.textContent).toBe('620 Wp');
   });
 
   it('moves the yellow highlight to the promotional kit card that is clicked', () => {

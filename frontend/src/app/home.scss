@@ -1202,13 +1202,15 @@ footer p {
   font: 900 0.9rem Manrope;
 }
 .offer-copy h3 {
-   width: calc(100% + 7rem);
-   font: 900 clamp(1.2rem, 2.1vw, 1.7rem) Manrope;
+   width: 100%;
+   font: 900 clamp(1.05rem, 1.8vw, 1.45rem) Manrope;
    line-height: 1.04;
    margin: 0;
 }
-.offer-copy h3 span,
 .offer-copy strong {
+   white-space: nowrap;
+}
+.offer-power {
    white-space: nowrap;
 }
 .offer-copy p {
@@ -1317,7 +1319,7 @@ footer p {
   }
   .offer-copy h3 {
     width: 100%;
-    font-size: clamp(1.15rem, 5vw, 1.55rem);
+    font-size: clamp(1.05rem, 4.5vw, 1.4rem);
   }
   .microinverter-photo {
     width: 82%;
