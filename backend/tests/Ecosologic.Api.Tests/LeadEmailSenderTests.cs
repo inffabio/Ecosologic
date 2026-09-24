@@ -43,6 +43,41 @@ public sealed class LeadEmailSenderTests
         Assert.Equal("contato@example.com", message.From.Mailboxes.Single().Address);
     }
 
+    [Fact]
+    public async Task Uses_the_same_png_logo_in_internal_and_customer_messages()
+    {
+        var transport = new RecordingSmtpTransport();
+        var sender = new LeadEmailSender(
+            Options.Create(new EmailSettings
+            {
+                Enabled = true,
+                SmtpHost = "smtp.example.com",
+                SmtpPort = 587,
+                SmtpUsername = "smtp-user",
+                SmtpPassword = "smtp-token",
+                FromAddress = "contato@example.com",
+                LeadRecipient = "owner@example.com"
+            }),
+            NullLogger<LeadEmailSender>.Instance,
+            new RecordingSmtpTransportFactory(transport));
+
+        await sender.SendAsync(new LeadRecord
+        {
+            Id = Guid.NewGuid(),
+            Name = "Ana",
+            Phone = "21999999999",
+            Email = "ana@example.com",
+            Message = "Quero um orçamento."
+        }, CancellationToken.None);
+
+        Assert.Equal(2, transport.Messages.Count);
+        Assert.All(transport.Messages, message =>
+        {
+            Assert.Contains("https://www.ecosologic.com.br/assets/brand/email-logo.png", message.HtmlBody);
+            Assert.DoesNotContain("<svg", message.HtmlBody, StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
     private sealed class RecordingSmtpTransportFactory(RecordingSmtpTransport transport) : ISmtpTransportFactory
     {
         public ISmtpTransport Create() => transport;
