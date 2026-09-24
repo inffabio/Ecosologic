@@ -8,7 +8,9 @@ test('home presents the main contact journey', async ({ page }) => {
   await expect(page.getByLabel('Seu nome')).toBeVisible();
   await expect(page.locator('.project-feature')).toHaveCount(0);
   await expect(page.locator('.video-frame p')).toHaveCount(0);
-  await expect(page.locator('[data-reveal]')).toHaveCount(6);
+  await expect(page.locator('[data-reveal]')).toHaveCount(7);
+  await expect(page.locator('.offer-cta')).toHaveCount(3);
+  await expect(page.locator('.offer-carousel')).toHaveAttribute('tabindex', '0');
   await expect(page.locator('.hero-bg')).toHaveAttribute('src', 'assets/hero-solar-garage-battery.png');
 
   const videoResponse = await page.request.get('/assets/video.mp4');

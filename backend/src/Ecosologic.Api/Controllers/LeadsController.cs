@@ -1,7 +1,6 @@
 using Ecosologic.Domain.Crm;
 using Ecosologic.Infrastructure.Persistence;
 using Ecosologic.Infrastructure.Email;
-using System.Net.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +45,7 @@ public sealed class LeadsController(
             {
                 await emailSender.SendAsync(record, cancellationToken);
             }
-            catch (Exception exception) when (exception is SmtpException or InvalidOperationException)
+            catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 logger?.LogError(exception, "Lead {LeadId} was saved but email delivery failed.", record.Id);
             }

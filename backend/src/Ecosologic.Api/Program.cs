@@ -66,6 +66,7 @@ builder.Services.AddAneelTariffSource();
 builder.Services.AddAneelTariffImport();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 builder.Services.AddSingleton<ILeadEmailSender, LeadEmailSender>();
+builder.Services.AddSingleton<ISmtpTransportFactory, MailKitSmtpTransportFactory>();
 
 var mediaPath = builder.Configuration["Storage:MediaPath"] ?? "wwwroot/uploads";
 var mediaRoot = Path.IsPathRooted(mediaPath) ? mediaPath : Path.Combine(builder.Environment.ContentRootPath, mediaPath);

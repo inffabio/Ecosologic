@@ -1,6 +1,8 @@
 <ion-app>
   <header class="site-header" [class.is-scrolled]="isScrolled()">
-    <a class="brand" href="#inicio" aria-label="Ecosologic, início"><img src="assets/brand/logo.png" alt="Ecosologic" /></a>
+    <a class="brand" href="#inicio" aria-label="Ecosologic, início"
+      ><img src="assets/brand/logo.png" alt="Ecosologic"
+    /></a>
     <nav aria-label="Navegação principal">
       <a href="#solucoes">Soluções</a>
       <a href="#hibrida">Híbrida</a>
@@ -8,12 +10,18 @@
       <a href="#projetos">Projetos</a>
       <a href="#contato">Contato</a>
     </nav>
-    <a class="header-cta" [href]="whatsappUrl()" target="_blank" rel="noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>
+    <a class="header-cta" [href]="whatsappUrl()" target="_blank" rel="noreferrer"
+      >WhatsApp <span aria-hidden="true">↗</span></a
+    >
   </header>
 
   <main>
     <section class="hero" id="inicio">
-      <img class="hero-bg" src="assets/hero-solar-garage-battery.png" alt="Sistema solar com bateria instalado em uma garagem residencial" />
+      <img
+        class="hero-bg"
+        src="assets/hero-solar-garage-battery.png"
+        alt="Sistema solar com bateria instalado em uma garagem residencial"
+      />
       <div class="hero-shade" aria-hidden="true"></div>
       <div class="hero-wave" aria-hidden="true">
         <svg viewBox="0 0 1600 110" preserveAspectRatio="none">
@@ -25,32 +33,50 @@
         <h1>{{ content().heroTitle }}</h1>
         <p class="hero-text">{{ content().heroText }}</p>
         <div class="hero-actions">
-          <a class="button button-solar" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Falar pelo WhatsApp <span>→</span></a>
+          <a class="button button-solar" [href]="whatsappUrl()" target="_blank" rel="noreferrer"
+            >Falar pelo WhatsApp <span>→</span></a
+          >
           <a class="button button-glass" href="#hibrida">Ver híbrida com bateria</a>
         </div>
       </div>
       <aside class="executive-slab" aria-label="Resumo da solução Ecosologic">
         <span>Diagnóstico comercial</span>
         <strong>Solar, bateria e retorno estimado em uma proposta clara.</strong>
-        <div><b>01</b><p>Conta de luz e perfil de consumo</p></div>
-        <div><b>02</b><p>Dimensionamento técnico e financeiro</p></div>
-        <div><b>03</b><p>Instalação e acompanhamento</p></div>
+        <div>
+          <b>01</b>
+          <p>Conta de luz e perfil de consumo</p>
+        </div>
+        <div>
+          <b>02</b>
+          <p>Dimensionamento técnico e financeiro</p>
+        </div>
+        <div>
+          <b>03</b>
+          <p>Instalação e acompanhamento</p>
+        </div>
       </aside>
     </section>
 
-      <section class="solar-command" data-reveal aria-label="Posicionamento comercial">
-        <p>Projeto solar com cara de investimento.</p>
-        <div><strong>25+</strong><span>anos de vida útil dos módulos</span></div>
-        <div><strong>360°</strong><span>visão técnica e comercial</span></div>
-        <div><strong>RJ</strong><span>atendimento direto com especialista</span></div>
-        <div class="section-wave section-wave--light" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
-      </section>
+    <section class="solar-command" data-reveal aria-label="Posicionamento comercial">
+      <p>Projeto solar com cara de investimento.</p>
+      <div><strong>25+</strong><span>anos de vida útil dos módulos</span></div>
+      <div><strong>360°</strong><span>visão técnica e comercial</span></div>
+      <div><strong>RJ</strong><span>atendimento direto com especialista</span></div>
+      <div class="section-wave section-wave--light" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
+    </section>
 
     <section class="solutions" data-reveal id="solucoes">
       <div class="section-kicker">Soluções por perfil</div>
       <div class="section-heading">
         <h2>Não é só instalar placa. É desenhar uma estratégia de energia para sua realidade.</h2>
-        <p>Residência, comércio, indústria ou agronegócio: cada projeto começa pelo consumo e termina em uma decisão simples de entender.</p>
+        <p>
+          Residência, comércio, indústria ou agronegócio: cada projeto começa pelo consumo e termina
+          em uma decisão simples de entender.
+        </p>
       </div>
       <div class="solution-list">
         @for (solution of content().solutions; track $index; let i = $index) {
@@ -58,27 +84,64 @@
             <span class="solution-number">{{ pad(i + 1) }}</span>
             <h3>{{ solution.title }}</h3>
             <p>{{ solution.text }}</p>
-            <a [href]="whatsappUrl()" target="_blank" rel="noreferrer" aria-label="Conversar sobre {{ solution.title }}"><span>→</span></a>
+            <a
+              [href]="whatsappUrl()"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Conversar sobre {{ solution.title }}"
+              ><span>→</span></a
+            >
           </article>
         }
       </div>
-      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      <div class="section-wave section-wave--dark" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
     </section>
 
     <section class="hybrid" data-reveal id="hibrida">
       <div class="hybrid-copy">
         <h2>Solar + bateria de lítio para quando economia e continuidade precisam andar juntas.</h2>
-        <p>O sistema híbrido combina geração fotovoltaica, rede elétrica e armazenamento. Ele permite aproveitar melhor a energia gerada durante o dia e manter cargas essenciais com apoio da bateria.</p>
+        <p>
+          O sistema híbrido combina geração fotovoltaica, rede elétrica e armazenamento. Ele permite
+          aproveitar melhor a energia gerada durante o dia e manter cargas essenciais com apoio da
+          bateria.
+        </p>
         <div class="hybrid-points">
-          <article><strong>Backup seletivo</strong><span>priorize iluminação, internet, refrigeração ou equipamentos críticos.</span></article>
-          <article><strong>Autoconsumo inteligente</strong><span>use mais da própria energia antes de depender da rede.</span></article>
-          <article><strong>Projeto sob medida</strong><span>dimensionamento com consumo, inversor, bateria e objetivo financeiro.</span></article>
+          <article>
+            <strong>Backup seletivo</strong
+            ><span>priorize iluminação, internet, refrigeração ou equipamentos críticos.</span>
+          </article>
+          <article>
+            <strong>Autoconsumo inteligente</strong
+            ><span>use mais da própria energia antes de depender da rede.</span>
+          </article>
+          <article>
+            <strong>Projeto sob medida</strong
+            ><span>dimensionamento com consumo, inversor, bateria e objetivo financeiro.</span>
+          </article>
         </div>
       </div>
       <div class="video-frame">
-        <video class="hybrid-video" src="assets/video.mp4" autoplay muted loop playsinline preload="metadata" (loadedmetadata)="playVideo($event)" (canplay)="playVideo($event)"></video>
+        <video
+          class="hybrid-video"
+          src="assets/video.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          (loadedmetadata)="playVideo($event)"
+          (canplay)="playVideo($event)"
+        ></video>
       </div>
-      <div class="section-wave section-wave--light" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      <div class="section-wave section-wave--light" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
     </section>
 
     <section class="process" data-reveal id="processo">
@@ -86,8 +149,13 @@
       <div class="process-layout">
         <div>
           <h2>Você entende o investimento antes de fechar o projeto.</h2>
-          <p>Sem promessa solta: a conversa passa por conta de luz, telhado, consumo, equipamentos e retorno estimado.</p>
-          <a class="text-link" [href]="whatsappUrl()" target="_blank" rel="noreferrer">Começar uma análise <span>→</span></a>
+          <p>
+            Sem promessa solta: a conversa passa por conta de luz, telhado, consumo, equipamentos e
+            retorno estimado.
+          </p>
+          <a class="text-link" [href]="whatsappUrl()" target="_blank" rel="noreferrer"
+            >Começar uma análise <span>→</span></a
+          >
         </div>
         <div class="process-steps">
           @for (step of content().processSteps; track $index; let i = $index) {
@@ -99,7 +167,11 @@
           }
         </div>
       </div>
-      <div class="section-wave section-wave--neutral" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      <div class="section-wave section-wave--neutral" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
     </section>
 
     <section class="projects" data-reveal id="projetos">
@@ -109,56 +181,293 @@
       </div>
       <div class="project-gallery">
         <div class="project-thumbnails-wrap">
-          <button class="project-chevron" type="button" (click)="scrollProjects(-1)" aria-label="Rolar projetos para a esquerda">‹</button>
-           <div #projectRail class="project-thumbnails" data-touch-scroll="true" role="list" aria-label="Selecionar projeto"
-             (pointerdown)="startProjectDrag($event)" (pointermove)="moveProjectDrag($event)"
-             (pointerup)="endProjectDrag($event)" (pointercancel)="endProjectDrag($event)">
+          <button
+            class="project-chevron"
+            type="button"
+            (click)="scrollProjects(-1)"
+            aria-label="Rolar projetos para a esquerda"
+          >
+            ‹
+          </button>
+          <div
+            #projectRail
+            class="project-thumbnails"
+            data-touch-scroll="true"
+            role="list"
+            aria-label="Selecionar projeto"
+            (pointerdown)="startProjectDrag($event)"
+            (pointermove)="moveProjectDrag($event)"
+            (pointerup)="endProjectDrag($event)"
+            (pointercancel)="endProjectDrag($event)"
+          >
             @for (project of content().projects; track $index; let i = $index) {
-              <button class="project-thumbnail" type="button" role="listitem" (click)="openProject(i)" [attr.aria-label]="'Ampliar ' + project.title">
+              <button
+                class="project-thumbnail"
+                type="button"
+                role="listitem"
+                (click)="openProject(i)"
+                [attr.aria-label]="'Ampliar ' + project.title"
+              >
                 <img [src]="project.imageUrl" [alt]="project.alt || project.title" />
               </button>
             }
           </div>
-          <button class="project-chevron" type="button" (click)="scrollProjects(1)" aria-label="Rolar projetos para a direita">›</button>
+          <button
+            class="project-chevron"
+            type="button"
+            (click)="scrollProjects(1)"
+            aria-label="Rolar projetos para a direita"
+          >
+            ›
+          </button>
         </div>
       </div>
-      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      <div class="section-wave section-wave--dark" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
     </section>
 
     @if (selectedProject() !== null && content().projects[selectedProject()!]; as project) {
       <div class="project-lightbox" role="presentation" (click)="closeProject()">
-        <div class="project-lightbox-panel" role="dialog" aria-modal="true" [attr.aria-label]="project.title" (click)="$event.stopPropagation()">
-          <button class="project-lightbox-close" type="button" (click)="closeProject()" aria-label="Fechar imagem">×</button>
+        <div
+          class="project-lightbox-panel"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-label]="project.title"
+          (click)="$event.stopPropagation()"
+        >
+          <button
+            class="project-lightbox-close"
+            type="button"
+            (click)="closeProject()"
+            aria-label="Fechar imagem"
+          >
+            ×
+          </button>
           <img [src]="project.imageUrl" [alt]="project.alt || project.title" />
-          <div class="project-lightbox-caption"><strong>{{ project.title }}</strong><span>{{ project.category }} · {{ project.power }}</span></div>
+          <div class="project-lightbox-caption">
+            <strong>{{ project.title }}</strong
+            ><span>{{ project.category }} · {{ project.power }}</span>
+          </div>
         </div>
       </div>
     }
 
+    <section class="offers" id="ofertas" data-reveal>
+      <div class="offers-head">
+        <img src="assets/offers/ecosologic-premium-logo.svg" alt="Ecosologic" />
+        <div>
+          <span class="section-kicker inverse">Kits promocionais</span>
+          <h2>Projetos solares com microinversor DEYE 2250W.</h2>
+          <p>
+            Ofertas com módulo 620 Wp, microinversor, preço promocional e vantagens técnicas que
+            ajudam o cliente a decidir.
+          </p>
+        </div>
+      </div>
+      <div class="offer-carousel-wrap">
+        <button
+          class="offer-chevron"
+          type="button"
+          (click)="scrollOffers(-1)"
+          aria-label="Rolar ofertas para a esquerda"
+        >
+          ‹
+        </button>
+        <ul
+          #offerRail
+          class="offer-carousel"
+          tabindex="0"
+          aria-label="Ofertas promocionais de energia solar"
+          (keydown)="onOfferKeydown($event)"
+        >
+          <li>
+            <article class="offer-card" aria-labelledby="offer-title-600">
+              <img
+                class="offer-panel-img"
+                src="assets/offers/modulo-solar.png"
+                alt="Módulo solar 620 Wp"
+              />
+              <div class="offer-copy">
+                <span class="offer-tag">SUPER OFERTA</span
+                ><span class="offer-consumption">600 kWh/mês</span>
+                <h3 id="offer-title-600">8 módulos solares 620 Wp</h3>
+                <p>
+                  2 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
+                </p>
+                <strong>R$ 10.752,89</strong
+                ><small
+                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
+                  Homologação.</small
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+              </div>
+              <img
+                class="microinverter-photo"
+                src="assets/offers/microinversor-deye.png"
+                alt="Microinversor DEYE 2250W"
+              />
+            </article>
+          </li>
+          <li>
+            <article class="offer-card is-featured" aria-labelledby="offer-title-800">
+              <img
+                class="offer-panel-img"
+                src="assets/offers/modulo-solar.png"
+                alt="Módulo solar 620 Wp"
+              />
+              <div class="offer-copy">
+                <span class="offer-tag">SUPER OFERTA</span
+                ><span class="offer-consumption">800 kWh/mês</span>
+                <h3 id="offer-title-800">11 módulos solares 620 Wp</h3>
+                <p>
+                  3 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
+                </p>
+                <strong>R$ 14.694,65</strong
+                ><small
+                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
+                  Homologação.</small
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+              </div>
+              <img
+                class="microinverter-photo"
+                src="assets/offers/microinversor-deye.png"
+                alt="Microinversor DEYE 2250W"
+              />
+            </article>
+          </li>
+          <li>
+            <article class="offer-card" aria-labelledby="offer-title-1000">
+              <img
+                class="offer-panel-img"
+                src="assets/offers/modulo-solar.png"
+                alt="Módulo solar 620 Wp"
+              />
+              <div class="offer-copy">
+                <span class="offer-tag">SUPER OFERTA</span
+                ><span class="offer-consumption">1000 kWh/mês</span>
+                <h3 id="offer-title-1000">13 módulos solares 620 Wp</h3>
+                <p>
+                  4 microinversores DEYE 2250W<br />1 estrutura para os módulos<br />1 stringbox
+                </p>
+                <strong>R$ 18.354,00</strong
+                ><small
+                  ><b>Além do equipamento, já está incluso:</b> Projeto, Instalação e
+                  Homologação.</small
+                ><a class="offer-cta" href="#contato">Solicitar avaliação <span>→</span></a>
+              </div>
+              <img
+                class="microinverter-photo"
+                src="assets/offers/microinversor-deye.png"
+                alt="Microinversor DEYE 2250W"
+              />
+            </article>
+          </li>
+        </ul>
+        <button
+          class="offer-chevron"
+          type="button"
+          (click)="scrollOffers(1)"
+          aria-label="Rolar ofertas para a direita"
+        >
+          ›
+        </button>
+      </div>
+      <h3 class="micro-benefits-title">Vantagens do microinversor</h3>
+      <div class="micro-benefits" aria-label="Vantagens do microinversor">
+        <article><b>01</b><span>Ampliação de potência mais tranquila.</span></article>
+        <article><b>02</b><span>Instalação discreta e acabamento limpo.</span></article>
+        <article><b>03</b><span>Monitoramento de cada módulo.</span></article>
+        <article><b>04</b><span>Se um módulo sombrear, só ele perde produção.</span></article>
+      </div>
+    </section>
     <section class="contact" data-reveal id="contato">
       <div class="contact-copy">
         <span class="section-kicker inverse">Contato direto</span>
         <h2>Solicite um orçamento para sua energia solar.</h2>
-        <p>Somos uma empresa com centenas de instalações e clientes satisfeitos. Preencha o formulário ou nos chame no WhatsApp para começar sua avaliação.</p>
+        <p>
+          Somos uma empresa com centenas de instalações e clientes satisfeitos. Preencha o
+          formulário ou nos chame no WhatsApp para começar sua avaliação.
+        </p>
       </div>
       <form (ngSubmit)="submitContact()" #contactForm="ngForm">
-        <label for="name">Seu nome<input id="name" name="name" [(ngModel)]="contact.name" required placeholder="Como posso chamar você?" /></label>
-        <label for="phone">WhatsApp<input id="phone" name="phone" [(ngModel)]="contact.phone" required placeholder="(21) 96584-7684" /></label>
-        <label for="email">Seu e-mail<input id="email" name="email" type="email" [(ngModel)]="contact.email" required placeholder="voce@empresa.com" /></label>
-        <label for="message">Objetivo<textarea id="message" name="message" [(ngModel)]="contact.message" rows="4" placeholder="Quero reduzir minha conta, avaliar bateria ou entender o retorno do investimento." ></textarea></label>
-        <label class="upload-card" for="bill"><input id="bill" name="bill" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" (change)="onBillSelected($event)" /><span class="upload-icon">+</span><strong>Anexar conta de luz</strong><small>{{ selectedBillName() }}</small></label>
-        <button class="button button-solar" type="submit" [disabled]="!contactForm.valid">Enviar solicitação <span>→</span></button>
+        <label for="name"
+          >Seu nome<input
+            id="name"
+            name="name"
+            [(ngModel)]="contact.name"
+            required
+            placeholder="Como posso chamar você?"
+        /></label>
+        <label for="phone"
+          >WhatsApp<input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputmode="tel"
+            [(ngModel)]="contact.phone"
+            (ngModelChange)="contact.phone = formatPhone($event)"
+            required
+            placeholder="(21) 96584-7684"
+        /></label>
+        <label for="email"
+          >Seu e-mail<input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="contact.email"
+            required
+            placeholder="voce@empresa.com"
+        /></label>
+        <label for="message"
+          >Objetivo<textarea
+            id="message"
+            name="message"
+            [(ngModel)]="contact.message"
+            rows="4"
+            placeholder="Quero reduzir minha conta, avaliar bateria ou entender o retorno do investimento."
+          ></textarea>
+        </label>
+        <label class="upload-card" for="bill"
+          ><input
+            id="bill"
+            name="bill"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            (change)="onBillSelected($event)"
+          /><span class="upload-icon">+</span><strong>Anexar conta de luz</strong
+          ><small>{{ selectedBillName() }}</small></label
+        >
+        <button class="button button-solar" type="submit" [disabled]="!contactForm.valid">
+          Enviar solicitação <span>→</span>
+        </button>
         <p class="form-note" aria-live="polite">{{ formMessage() }}</p>
       </form>
-      <div class="section-wave section-wave--dark" aria-hidden="true"><svg viewBox="0 0 1600 90" preserveAspectRatio="none"><path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" /></svg></div>
+      <div class="section-wave section-wave--dark" aria-hidden="true">
+        <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+          <path d="M0 44C180 88 360 10 540 44s360-28 540 2 360-24 520 2v42H0Z" />
+        </svg>
+      </div>
     </section>
-    </main>
+  </main>
 
-    <a class="floating-whatsapp" [href]="whatsappUrl()" target="_blank" rel="noreferrer" title="Contato" aria-label="Contato pelo WhatsApp">
-      <svg aria-hidden="true" viewBox="0 0 32 32"><path d="M16.04 3.2A12.68 12.68 0 0 0 5.18 22.42L3.2 29l6.74-1.92A12.68 12.68 0 1 0 16.04 3.2Zm0 2.25a10.43 10.43 0 0 1 8.86 15.92 10.43 10.43 0 0 1-13.5 3.65l-.48-.24-4 1.14 1.17-3.86-.26-.5A10.43 10.43 0 0 1 16.04 5.45Zm-4.2 5.55c-.23 0-.6.09-.92.43-.32.35-1.2 1.18-1.2 2.87s1.23 3.33 1.4 3.56c.18.23 2.38 3.8 5.9 5.18 2.93 1.15 3.53.92 4.16.86.64-.06 2.06-.84 2.35-1.65.29-.81.29-1.5.2-1.65-.08-.14-.31-.23-.66-.4-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.18-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.18-1.48-.55-2.82-1.74-1.04-.93-1.74-2.08-1.94-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.58-.28-.67-.57-.58-.78-.59h-.66Z" /></svg>
-    </a>
+  <a
+    class="floating-whatsapp"
+    [href]="whatsappUrl()"
+    target="_blank"
+    rel="noreferrer"
+    title="Contato"
+    aria-label="Contato pelo WhatsApp"
+  >
+    <svg aria-hidden="true" viewBox="0 0 32 32">
+      <path
+        d="M16.04 3.2A12.68 12.68 0 0 0 5.18 22.42L3.2 29l6.74-1.92A12.68 12.68 0 1 0 16.04 3.2Zm0 2.25a10.43 10.43 0 0 1 8.86 15.92 10.43 10.43 0 0 1-13.5 3.65l-.48-.24-4 1.14 1.17-3.86-.26-.5A10.43 10.43 0 0 1 16.04 5.45Zm-4.2 5.55c-.23 0-.6.09-.92.43-.32.35-1.2 1.18-1.2 2.87s1.23 3.33 1.4 3.56c.18.23 2.38 3.8 5.9 5.18 2.93 1.15 3.53.92 4.16.86.64-.06 2.06-.84 2.35-1.65.29-.81.29-1.5.2-1.65-.08-.14-.31-.23-.66-.4-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.18-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.18-1.48-.55-2.82-1.74-1.04-.93-1.74-2.08-1.94-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.58-.28-.67-.57-.58-.78-.59h-.66Z"
+      />
+    </svg>
+  </a>
 
-    <footer>
+  <footer>
     <img src="assets/brand/logo.png" alt="Ecosologic" />
     <p>Energia distribuída, solar fotovoltaica e soluções híbridas com bateria.</p>
     <span>© 2026 Ecosologic</span>

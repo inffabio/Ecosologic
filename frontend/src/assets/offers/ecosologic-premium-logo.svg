@@ -1,0 +1,11 @@
+<svg width="360" height="92" viewBox="0 0 360 92" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ecosologic">
+  <path d="M46 13c-16 7-25 22-25 38 0 10 4 20 11 27" stroke="#F36B22" stroke-width="6" stroke-linecap="round"/>
+  <path d="M82 18c10 9 16 21 16 35 0 13-5 25-15 33" stroke="#00B386" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 7c-6 18 0 31 17 39 8-18 1-32-17-39Z" fill="#00B386"/>
+  <path d="M87 45c-12 1-21-4-28-14 13-4 23 0 28 14Z" fill="#13D49A"/>
+  <path d="M59 24 37 58h19L43 87l37-44H60l-1-19Z" fill="#F36B22"/>
+  <text x="122" y="55" fill="#F8FFF7" font-family="Manrope, Arial, sans-serif" font-weight="900" font-size="38" letter-spacing="-.9">Eco</text>
+  <text x="190" y="55" fill="#F36B22" font-family="Manrope, Arial, sans-serif" font-weight="900" font-size="38" letter-spacing="-.9">sol</text>
+  <text x="246" y="55" fill="#F8FFF7" font-family="Manrope, Arial, sans-serif" font-weight="900" font-size="38" letter-spacing="-.9">ogic</text>
+  <text x="124" y="75" fill="#9FB5AE" font-family="Manrope, Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="2.4">ENERGIA SOLAR DISTRIBUÍDA</text>
+</svg>
