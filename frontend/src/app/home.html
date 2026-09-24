@@ -433,16 +433,15 @@
             [class.field-invalid]="contactForm.submitted && !contact.message.trim()"
           ></textarea>@if (contactForm.submitted && !contact.message.trim()) {<small class="field-error">Este campo é obrigatório.</small>}
         </label>
-        <label class="upload-card" [class.field-invalid]="contactForm.submitted && selectedBillName() === 'Nenhum arquivo selecionado'" for="bill"
+        <label class="upload-card" for="bill"
           ><input
             id="bill"
             name="bill"
             type="file"
             accept=".pdf,.jpg,.jpeg,.png,.webp"
-            required
             (change)="onBillSelected($event)"
           /><span class="upload-icon">+</span><strong>Anexar conta de luz <b aria-hidden="true">*</b></strong
-          ><small>{{ selectedBillName() }}</small>@if (contactForm.submitted && selectedBillName() === 'Nenhum arquivo selecionado') {<small class="field-error">Este campo é obrigatório.</small>}</label
+          ><small>{{ selectedBillName() }}</small></label
         >
         <button class="button button-solar" type="submit">
           Enviar solicitação <span>→</span>

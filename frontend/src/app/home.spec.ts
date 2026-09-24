@@ -229,8 +229,9 @@ describe('Home', () => {
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     fixture.detectChanges();
 
-    expect(form.querySelectorAll('.field-error').length).toBe(5);
-    expect(form.querySelectorAll('.field-invalid').length).toBe(5);
+    expect(form.querySelectorAll('.field-error').length).toBe(4);
+    expect(form.querySelectorAll('.field-invalid').length).toBe(4);
+    expect(form.querySelector('.upload-card')?.classList.contains('field-invalid')).toBeFalse();
     expect(form.textContent).toContain('Este campo é obrigatório.');
   });
 

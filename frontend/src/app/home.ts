@@ -450,7 +450,7 @@ export class Home implements AfterViewInit, OnDestroy {
   }
   submitContact(form: NgForm) {
     form.form.markAllAsTouched();
-    if (!form.valid || this.selectedBillName() === 'Nenhum arquivo selecionado') return;
+    if (!form.valid || !this.contact.name.trim() || !this.contact.phone.trim() || !this.contact.email.trim() || !this.contact.message.trim()) return;
     const billMessage =
       this.selectedBillName() !== 'Nenhum arquivo selecionado'
         ? `${this.contact.message || ''}\nConta de luz selecionada no formulário: ${this.selectedBillName()}`
