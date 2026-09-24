@@ -1159,6 +1159,7 @@ footer p {
   box-shadow: 0 28px 90px #0009;
   scroll-snap-align: start;
    padding: 1.5rem;
+   border: 2px solid transparent;
 }
 .offer-card:before {
   content: '';
@@ -1172,7 +1173,7 @@ footer p {
   transform: rotate(8deg);
 }
 .offer-card.is-featured {
-  outline: 2px solid #f5c84c88;
+   border-color: #f5c84c;
 }
 .offer-panel-img {
   position: absolute;
@@ -1201,8 +1202,8 @@ footer p {
   font: 900 0.9rem Manrope;
 }
 .offer-copy h3 {
-   width: calc(100% + 9rem);
-   font: 900 clamp(1.35rem, 2.5vw, 1.95rem) Manrope;
+   width: calc(100% + 7rem);
+   font: 900 clamp(1.2rem, 2.1vw, 1.7rem) Manrope;
    line-height: 1.04;
    margin: 0;
 }
@@ -1316,7 +1317,7 @@ footer p {
   }
   .offer-copy h3 {
     width: 100%;
-    font-size: clamp(1.35rem, 6vw, 1.8rem);
+    font-size: clamp(1.15rem, 5vw, 1.55rem);
   }
   .microinverter-photo {
     width: 82%;
