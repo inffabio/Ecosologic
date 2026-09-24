@@ -26,4 +26,8 @@
     <InternalsVisibleTo Include="Ecosologic.Api.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Ecosologic.Infrastructure\Email\EmailAssets\email-logo.png" Link="EmailAssets\email-logo.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
