@@ -48,18 +48,59 @@ Estados:
 
 #### 2. Montador de Cargas: `/admin/dimensionamento/cargas`
 
-Composição em duas zonas:
+Composição em duas zonas, com a grid como instrumento principal:
 
 - coluna esquerda: biblioteca pesquisável de aparelhos;
-- área central: grupos de simultaneidade e cargas soltas;
+- área central: **grid viva de equipamentos**;
 - Loadboard fixa no topo da área de trabalho.
 
-O operador arrasta um aparelho para `Casa`, `Loja`, `Padaria` ou um grupo
-criado por ele. Ao soltar, abre uma edição inline curta com quantidade, tensão
-e horas de uso. A seleção também pode ser feita pelo teclado.
+O operador pesquisa fabricante, modelo ou categoria. Cada resultado pode ser
+arrastado para a grid ou incluído pelo botão `Adicionar`. Ao inserir, a linha
+recebe edição inline de quantidade, tensão e horas de uso. A seleção também
+pode ser feita pelo teclado.
+
+### Grid viva de equipamentos
+
+Colunas desktop:
+
+- equipamento: fabricante e modelo;
+- categoria;
+- quantidade;
+- tensão;
+- potência unitária;
+- potência total;
+- corrente nominal;
+- pico de partida;
+- grupo de simultaneidade;
+- remover.
+
+Colunas calculadas não são editáveis. A cada inclusão ou alteração, a grid
+recalcula a linha e o rodapé total sem recarregar a página.
+
+Rodapé fixo da grid:
+
+- `Potência total`: soma das potências das quantidades;
+- `Corrente nominal total`: soma das correntes conforme a tensão de cada linha;
+- `Pico de partida`: maior cenário de partida dos grupos, não uma soma cega de
+  todos os motores;
+- `Cargas`: quantidade de linhas e unidades.
+
+O sistema deve distinguir a soma elétrica por tensão. Uma carga `127 V` e outra
+`220 V` não devem ser somadas como se compartilhassem o mesmo circuito. O
+rodapé mostra o total geral e, quando necessário, subtotais `127 V` e `220 V`.
+
+O pico deve respeitar os grupos de simultaneidade. Quando não houver grupos,
+o sistema exibirá a hipótese usada e permitirá configurar o percentual de
+simultaneidade. O resultado sempre mostrará a diferença entre potência
+contínua, corrente nominal e pico.
 
 Cada item mostra fabricante, modelo, watts, ícone de motor quando aplicável e
 uma linha de corrente calculada após a tensão ser definida.
+
+Ao pesquisar, resultados já presentes na grid devem aparecer marcados como
+`Adicionado`, e a ação deve aumentar a quantidade da linha existente ou criar
+uma linha separada somente quando o usuário escolher explicitamente `Adicionar
+como nova linha`.
 
 #### 3. Sistema Híbrido: `/admin/dimensionamento/hibrido`
 
@@ -154,6 +195,10 @@ States:
 - blocked when peak exceeds inverter;
 - stale when an input changed but recalculation is pending.
 
+Em telas largas, a Loadboard fica acoplada ao cabeçalho da grid. Em telas
+menores, o resumo de potência e corrente permanece sticky na parte inferior e
+`Ver detalhes` abre o painel completo.
+
 ## Form Rules
 
 - Um grupo expõe no máximo quatro campos primários por vez.
@@ -198,6 +243,11 @@ States:
 - Item duplicado: impedir inserção e oferecer `Ver item existente`.
 - Modelo sem multiplicador de motor: bloquear cálculo de pico e encaminhar para
   revisão.
+- Pesquisa retorna um item já adicionado: oferecer aumentar quantidade ou
+  adicionar como linha separada, sem duplicar silenciosamente.
+- Linha com tensão diferente do catálogo: bloquear inclusão e solicitar uma
+  variante válida.
+- Alteração de quantidade para zero: solicitar remoção ou restaurar `1`.
 - Tensão incompatível: impedir seleção e explicar a variante disponível.
 - Bateria insuficiente: mostrar quantos módulos adicionais são necessários.
 - Inversor insuficiente: bloquear aprovação, não apenas mostrar um aviso.

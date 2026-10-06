@@ -82,6 +82,10 @@ Os números são alinhados em uma régua horizontal com pequenos marcadores de
 escala. A régua muda de estado apenas quando os cálculos mudam. Ela é o sinal
 visual que liga catálogo, dimensionamento, bateria, inversor e cabos.
 
+No montador híbrido, a Loadboard é o rodapé vivo da grid de equipamentos. Ela
+mostra totais gerais e subtotais por tensão, preservando a distinção entre
+potência contínua, corrente nominal e pico de partida.
+
 ## Navigation
 
 Usar o rail administrativo existente, com estes grupos:
