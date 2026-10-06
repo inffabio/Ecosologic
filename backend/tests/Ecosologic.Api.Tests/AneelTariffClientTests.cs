@@ -198,8 +198,8 @@ public class AneelTariffClientTests
         }
 
         var whereText = where.GetRawText();
-        Assert.Contains("Light", whereText);
-        Assert.Contains("Enel RJ", whereText);
+        Assert.DoesNotContain("Light", whereText);
+        Assert.DoesNotContain("Enel RJ", whereText);
         Assert.Contains("Componentes.Grupo", whereText);
         Assert.Contains("B1", whereText);
         Assert.Contains("B2", whereText);

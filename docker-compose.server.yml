@@ -32,6 +32,19 @@ services:
       Tariffs__SourceUrl: ${TARIFFS_SOURCE_URL:-}
       Tariffs__HttpTimeoutSeconds: ${TARIFFS_HTTP_TIMEOUT_SECONDS:-30}
       Tariffs__MaxRetries: ${TARIFFS_MAX_RETRIES:-3}
+      OCI_SECRET_OCID: ${OCI_SECRET_OCID:-}
+      OCI_CONFIG_FILE: ${OCI_CONFIG_FILE:-/app/.oci/config}
+      OCI_PROFILE: ${OCI_PROFILE:-DEFAULT}
+      InternalSecrets__Token: ${INTERNAL_SECRETS_TOKEN:-}
+      InternalSecrets__CacheSeconds: ${INTERNAL_SECRETS_CACHE_SECONDS:-300}
+      InternalSecrets__VaultOcid: ${OCI_VAULT_OCID:-}
+      InternalSecrets__SecretNames__N8N_API_KEY: ${OCI_SECRET_N8N_API_NAME:-N8N-APIKEY}
+      InternalSecrets__SecretNames__TAVILY_API_KEY: ${OCI_SECRET_TAVILY_API_NAME:-TAVILY-API-KEY}
+      InternalSecrets__SecretNames__TAVILY_MCP: ${OCI_SECRET_TAVILY_MCP_NAME:-TAVILY-MCP}
+      InternalSecrets__SecretNames__9ROUTER_API_KEY: ${OCI_SECRET_9ROUTER_API_NAME:-9ROUTER-API-KEY}
+      InternalSecrets__SecretNames__BRAVE_API_KEY: ${OCI_SECRET_BRAVE_API_NAME:-BRAVE-API-KEY}
+      RegionalLeadEnrichment__WebhookUrl: ${REGIONAL_LEAD_WEBHOOK_URL:-}
+      RegionalLeadEnrichment__WebhookToken: ${REGIONAL_LEAD_WEBHOOK_TOKEN:-}
       Email__Enabled: ${EMAIL_ENABLED:-true}
       Email__SmtpHost: ${EMAIL_SMTP_HOST:-${ALERT_SMTP_HOST:-}}
       Email__SmtpPort: ${EMAIL_SMTP_PORT:-${ALERT_SMTP_PORT:-587}}
@@ -49,6 +62,7 @@ services:
     volumes:
       - media-data:/app/wwwroot/uploads
       - api-data-protection-keys:/root/.aspnet/DataProtection-Keys
+      - ${OCI_CONFIG_HOST_PATH:-/home/hannibal/.oci}:/app/.oci:ro
 
   web:
     build:
@@ -59,6 +73,33 @@ services:
     depends_on:
       - api
 
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: n8n
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_HOST: ${N8N_HOST:-n8n.localhost}
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-https}
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL:-https://n8n.localhost/}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_SECURE_COOKIE: "true"
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: ${N8N_EXECUTIONS_MAX_AGE:-168}
+    ports:
+      - "127.0.0.1:5678:5678"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - n8n-data:/home/node/.n8n
+
 networks:
   default:
     name: ecosologic_default
@@ -68,3 +109,4 @@ volumes:
   media-data:
   api-data-protection-keys:
     name: ecosologic_api_data_protection_keys
+  n8n-data:

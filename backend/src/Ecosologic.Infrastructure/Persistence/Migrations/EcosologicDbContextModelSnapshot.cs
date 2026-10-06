@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -73,6 +74,46 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                     b.ToTable("crm_notifications", (string)null);
                 });
 
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.DistributorRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AneelId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Cnpj")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("LastSyncedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OfficialName")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("character varying(240)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .HasColumnType("tsvector");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AneelId")
+                        .IsUnique();
+
+                    b.HasIndex("OfficialName");
+
+                    b.ToTable("Distributors", (string)null);
+                });
+
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.GridCompensationRuleRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -91,6 +132,9 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
+
+                    b.Property<Guid?>("DistributorId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Group")
                         .HasMaxLength(8)
@@ -141,14 +185,16 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Distributor", "Group", "Subgroup", "Modality", "Post", "ReferenceYear", "ValidityStart")
+                    b.HasIndex("DistributorId");
+
+                    b.HasIndex("Distributor", "DistributorId", "Group", "Subgroup", "Modality", "Post", "ReferenceYear", "ValidityStart")
                         .IsUnique();
 
                     b.ToTable("grid_compensation_rules", null, t =>
                         {
                             t.HasCheckConstraint("CK_grid_compensation_rules_base_component", "\"BaseComponent\" IN ('TE','TUSD','TUSD_DISTRIBUTION','TUSD_TRANSMISSION','FIO_B','TAX','DEMAND','OVERAGE','OTHER')");
 
-                            t.HasCheckConstraint("CK_grid_compensation_rules_distributor", "\"Distributor\" IN ('Light','EnelRio')");
+                            t.HasCheckConstraint("CK_grid_compensation_rules_distributor", "\"Distributor\" IN ('Light','EnelRio','Dynamic')");
 
                             t.HasCheckConstraint("CK_grid_compensation_rules_post", "\"Post\" IN ('Single','Peak','Intermediate','OffPeak')");
 
@@ -387,6 +433,86 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarMaterialPriceRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ValidFrom")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId", "ValidFrom")
+                        .IsUnique();
+
+                    b.ToTable("solar_material_prices", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_solar_material_prices_amount_nonnegative", "\"Amount\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarMaterialRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<int>("PowerW")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TechnicalDataJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Type", "Brand", "Model")
+                        .IsUnique();
+
+                    b.ToTable("solar_materials", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_solar_materials_brand_nonempty", "\"Brand\" <> ''");
+
+                            t.HasCheckConstraint("CK_solar_materials_model_nonempty", "\"Model\" <> ''");
+
+                            t.HasCheckConstraint("CK_solar_materials_power_positive", "\"PowerW\" > 0");
+
+                            t.HasCheckConstraint("CK_solar_materials_type", "\"Type\" IN ('Module','Inverter')");
+                        });
+                });
+
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarQuoteRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -408,6 +534,13 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .HasPrecision(8, 4)
                         .HasColumnType("numeric(8,4)");
 
+                    b.Property<DateTimeOffset?>("PriceRefreshedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PriceRefreshedBy")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
                     b.Property<Guid>("SizingId")
                         .HasColumnType("uuid");
 
@@ -419,6 +552,11 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
+
+                    b.Property<string>("SupplierName")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
 
                     b.Property<decimal>("TaxPercent")
                         .HasPrecision(8, 4)
@@ -474,6 +612,9 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("DistributorId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("EngineVersion")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -491,6 +632,10 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("LeadId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("MaterialSnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Modalidade")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -503,6 +648,10 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
+
+                    b.Property<string>("TariffSnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -523,6 +672,55 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_solar_sizings_status", "\"Status\" IN ('Draft','Calculated','Approved','Cancelled')");
                         });
+                });
+
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarSupplierRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Contact")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("WhatsApp")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("solar_suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.TariffComponentRecord", b =>
@@ -593,6 +791,9 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
+                    b.Property<Guid?>("DistributorId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Group")
                         .IsRequired()
                         .HasMaxLength(8)
@@ -639,12 +840,14 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DistributorId");
+
                     b.HasIndex("Distributor", "Group", "Subgroup", "Modality", "ValidityStart", "Version")
                         .IsUnique();
 
                     b.ToTable("tariff_profiles", null, t =>
                         {
-                            t.HasCheckConstraint("CK_tariff_profiles_distributor", "\"Distributor\" IN ('Light','EnelRio')");
+                            t.HasCheckConstraint("CK_tariff_profiles_distributor", "\"Distributor\" IN ('Light','EnelRio','Dynamic')");
 
                             t.HasCheckConstraint("CK_tariff_profiles_group", "\"Group\" IN ('A','B')");
 
@@ -742,6 +945,16 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.GridCompensationRuleRecord", b =>
+                {
+                    b.HasOne("Ecosologic.Infrastructure.Persistence.DistributorRecord", "DistributorRecord")
+                        .WithMany()
+                        .HasForeignKey("DistributorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DistributorRecord");
+                });
+
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.LeadActivityRecord", b =>
                 {
                     b.HasOne("Ecosologic.Infrastructure.Persistence.LeadRecord", "Lead")
@@ -775,6 +988,17 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                     b.Navigation("Quote");
                 });
 
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarMaterialPriceRecord", b =>
+                {
+                    b.HasOne("Ecosologic.Infrastructure.Persistence.SolarMaterialRecord", "Material")
+                        .WithMany("Prices")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarQuoteRecord", b =>
                 {
                     b.HasOne("Ecosologic.Infrastructure.Persistence.SolarSizingRecord", "Sizing")
@@ -806,11 +1030,26 @@ namespace Ecosologic.Infrastructure.Persistence.Migrations
                     b.Navigation("Profile");
                 });
 
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.TariffProfileRecord", b =>
+                {
+                    b.HasOne("Ecosologic.Infrastructure.Persistence.DistributorRecord", "DistributorRecord")
+                        .WithMany()
+                        .HasForeignKey("DistributorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DistributorRecord");
+                });
+
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.LeadRecord", b =>
                 {
                     b.Navigation("Activities");
 
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarMaterialRecord", b =>
+                {
+                    b.Navigation("Prices");
                 });
 
             modelBuilder.Entity("Ecosologic.Infrastructure.Persistence.SolarQuoteRecord", b =>

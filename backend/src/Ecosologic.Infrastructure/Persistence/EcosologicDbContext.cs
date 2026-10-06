@@ -2,6 +2,8 @@ using Ecosologic.Domain.Crm;
 using Ecosologic.Domain.Solar;
 using Ecosologic.Infrastructure.Solar;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
+using System.Text.Json.Serialization;
 
 namespace Ecosologic.Infrastructure.Persistence;
 
@@ -14,11 +16,15 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
     public DbSet<HomeContentRecord> HomeContent => Set<HomeContentRecord>();
     public DbSet<SolarSizingRecord> SolarSizings => Set<SolarSizingRecord>();
     public DbSet<SolarQuoteRecord> SolarQuotes => Set<SolarQuoteRecord>();
+    public DbSet<SolarSupplierRecord> SolarSuppliers => Set<SolarSupplierRecord>();
     public DbSet<ProposalRecord> Proposals => Set<ProposalRecord>();
     public DbSet<TariffProfileRecord> TariffProfiles => Set<TariffProfileRecord>();
+    public DbSet<DistributorRecord> Distributors => Set<DistributorRecord>();
     public DbSet<TariffComponentRecord> TariffComponents => Set<TariffComponentRecord>();
     public DbSet<GridCompensationRuleRecord> GridCompensationRules => Set<GridCompensationRuleRecord>();
     public DbSet<AneelTariffImportRecord> AneelTariffImports => Set<AneelTariffImportRecord>();
+    public DbSet<SolarMaterialRecord> SolarMaterials => Set<SolarMaterialRecord>();
+    public DbSet<SolarMaterialPriceRecord> SolarMaterialPrices => Set<SolarMaterialPriceRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -127,11 +133,14 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             });
             entity.HasKey(sizing => sizing.Id);
             entity.Property(sizing => sizing.LeadId).IsRequired();
+            entity.Property(sizing => sizing.DistributorId);
             entity.Property(sizing => sizing.Concessionaria).HasMaxLength(120).IsRequired();
             entity.Property(sizing => sizing.Grupo).HasMaxLength(16).IsRequired();
             entity.Property(sizing => sizing.Modalidade).HasMaxLength(64).IsRequired();
             entity.Property(sizing => sizing.EngineVersion).HasMaxLength(32).IsRequired();
             entity.Property(sizing => sizing.InputsJson).HasColumnType("text").IsRequired();
+            entity.Property(sizing => sizing.MaterialSnapshotJson).HasColumnType("text").IsRequired();
+            entity.Property(sizing => sizing.TariffSnapshotJson).HasColumnType("text").IsRequired();
             entity.Property(sizing => sizing.ResultsJson).HasColumnType("text");
             entity.Property(sizing => sizing.Status).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.Property(sizing => sizing.CreatedAt).IsRequired();
@@ -165,6 +174,7 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             });
             entity.HasKey(quote => quote.Id);
             entity.Property(quote => quote.SizingId).IsRequired();
+            entity.Property(quote => quote.SupplierName).HasMaxLength(254).IsRequired();
             entity.Property(quote => quote.ItemsJson).HasColumnType("text").IsRequired();
             entity.Property(quote => quote.TotalCost).HasPrecision(18, 2).IsRequired();
             entity.Property(quote => quote.MarginPercent).HasPrecision(8, 4).IsRequired();
@@ -176,12 +186,29 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             entity.Property(quote => quote.Status).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.Property(quote => quote.CreatedAt).IsRequired();
             entity.Property(quote => quote.UpdatedAt).IsRequired();
+            entity.Property(quote => quote.PriceRefreshedAt);
+            entity.Property(quote => quote.PriceRefreshedBy).HasMaxLength(254);
             entity.HasIndex(quote => quote.SizingId);
             entity.HasIndex(quote => quote.CreatedAt);
             entity.HasMany(quote => quote.Proposals)
                 .WithOne(proposal => proposal.Quote)
                 .HasForeignKey(proposal => proposal.QuoteId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SolarSupplierRecord>(entity =>
+        {
+            entity.ToTable("solar_suppliers");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Name).HasMaxLength(254).IsRequired();
+            entity.Property(item => item.Website).HasMaxLength(512);
+            entity.Property(item => item.Contact).HasMaxLength(254);
+            entity.Property(item => item.ContactName).HasMaxLength(254);
+            entity.Property(item => item.Phone).HasMaxLength(40);
+            entity.Property(item => item.WhatsApp).HasMaxLength(40);
+            entity.Property(item => item.Source).HasMaxLength(512).IsRequired();
+            entity.Property(item => item.Status).HasMaxLength(32).IsRequired();
+            entity.HasIndex(item => item.Name).IsUnique();
         });
 
         modelBuilder.Entity<ProposalRecord>(entity =>
@@ -208,13 +235,28 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             entity.HasIndex(proposal => proposal.CreatedAt);
         });
 
+        modelBuilder.Entity<DistributorRecord>(entity =>
+        {
+            entity.ToTable("Distributors");
+            entity.HasKey(distributor => distributor.Id);
+            entity.Property(distributor => distributor.AneelId).HasMaxLength(128).IsRequired();
+            entity.Property(distributor => distributor.OfficialName).HasMaxLength(240).IsRequired();
+            entity.Property(distributor => distributor.Cnpj).HasMaxLength(32);
+            if (Database.ProviderName != "Npgsql.EntityFrameworkCore.PostgreSQL")
+                entity.Ignore(distributor => distributor.SearchVector);
+            else
+                entity.Property(distributor => distributor.SearchVector).HasColumnType("tsvector");
+            entity.HasIndex(distributor => distributor.AneelId).IsUnique();
+            entity.HasIndex(distributor => distributor.OfficialName);
+        });
+
         modelBuilder.Entity<TariffProfileRecord>(entity =>
         {
             entity.ToTable("tariff_profiles", table =>
             {
                 table.HasCheckConstraint(
                     "CK_tariff_profiles_distributor",
-                    "\"Distributor\" IN ('Light','EnelRio')");
+                    "\"Distributor\" IN ('Light','EnelRio','Dynamic')");
                 table.HasCheckConstraint(
                     "CK_tariff_profiles_group",
                     "\"Group\" IN ('A','B')");
@@ -232,6 +274,10 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
                     "\"ResolutionCode\" <> ''");
             });
             entity.HasKey(profile => profile.Id);
+            entity.HasOne(profile => profile.DistributorRecord)
+                .WithMany()
+                .HasForeignKey(profile => profile.DistributorId)
+                .OnDelete(DeleteBehavior.Restrict);
             entity.Property(profile => profile.Distributor).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.Property(profile => profile.Group).HasConversion<string>().HasMaxLength(8).IsRequired();
             entity.Property(profile => profile.Subgroup).HasConversion<string>().HasMaxLength(16).IsRequired();
@@ -302,7 +348,7 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             {
                 table.HasCheckConstraint(
                     "CK_grid_compensation_rules_distributor",
-                    "\"Distributor\" IN ('Light','EnelRio')");
+                    "\"Distributor\" IN ('Light','EnelRio','Dynamic')");
                 table.HasCheckConstraint(
                     "CK_grid_compensation_rules_post",
                     "\"Post\" IN ('Single','Peak','Intermediate','OffPeak')");
@@ -320,6 +366,10 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
                     "\"ResolutionCode\" <> ''");
             });
             entity.HasKey(rule => rule.Id);
+            entity.HasOne(rule => rule.DistributorRecord)
+                .WithMany()
+                .HasForeignKey(rule => rule.DistributorId)
+                .OnDelete(DeleteBehavior.Restrict);
             entity.Property(rule => rule.Distributor).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.Property(rule => rule.Group).HasConversion<string>().HasMaxLength(8);
             entity.Property(rule => rule.Subgroup).HasConversion<string>().HasMaxLength(16);
@@ -338,6 +388,7 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             entity.HasIndex(rule => new
             {
                 rule.Distributor,
+                rule.DistributorId,
                 rule.Group,
                 rule.Subgroup,
                 rule.Modality,
@@ -376,7 +427,116 @@ public sealed class EcosologicDbContext(DbContextOptions<EcosologicDbContext> op
             entity.HasIndex(record => new { record.Status, record.StartedAt });
             entity.HasIndex(record => record.SourceHash);
         });
+
+        modelBuilder.Entity<SolarMaterialRecord>(entity =>
+        {
+            entity.ToTable("solar_materials", table =>
+            {
+                table.HasCheckConstraint("CK_solar_materials_type", "\"Type\" IN ('Module','Inverter')");
+                table.HasCheckConstraint("CK_solar_materials_power_positive", "\"PowerW\" > 0");
+                table.HasCheckConstraint("CK_solar_materials_brand_nonempty", "\"Brand\" <> ''");
+                table.HasCheckConstraint("CK_solar_materials_model_nonempty", "\"Model\" <> ''");
+            });
+            entity.HasKey(material => material.Id);
+            entity.Property(material => material.Type).HasConversion<string>().HasMaxLength(16).IsRequired();
+            entity.Property(material => material.Brand).HasMaxLength(160).IsRequired();
+            entity.Property(material => material.Model).HasMaxLength(160).IsRequired();
+            entity.Property(material => material.PowerW).IsRequired();
+            entity.Property(material => material.TechnicalDataJson).HasColumnType("text").IsRequired();
+            entity.Property(material => material.SourceUrl).HasMaxLength(500).IsRequired();
+            entity.Property(material => material.CreatedAt).IsRequired();
+            entity.HasIndex(material => new { material.Type, material.Brand, material.Model }).IsUnique();
+            entity.HasMany(material => material.Prices)
+                .WithOne(price => price.Material)
+                .HasForeignKey(price => price.MaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Navigation(material => material.Prices).HasField("_prices");
+        });
+
+        modelBuilder.Entity<SolarMaterialPriceRecord>(entity =>
+        {
+            entity.ToTable("solar_material_prices", table =>
+                table.HasCheckConstraint("CK_solar_material_prices_amount_nonnegative", "\"Amount\" >= 0"));
+            entity.HasKey(price => price.Id);
+            entity.Property(price => price.MaterialId).IsRequired();
+            entity.Property(price => price.Amount).HasPrecision(18, 2).IsRequired();
+            entity.Property(price => price.ValidFrom).IsRequired();
+            entity.HasIndex(price => new { price.MaterialId, price.ValidFrom }).IsUnique();
+        });
     }
+}
+
+public sealed class SolarMaterialRecord
+{
+    private readonly List<SolarMaterialPriceRecord> _prices = [];
+
+    public Guid Id { get; private set; }
+    public SolarMaterialType Type { get; private set; }
+    public string Brand { get; private set; } = "";
+    public string Model { get; private set; } = "";
+    public int PowerW { get; private set; }
+    public string TechnicalDataJson { get; private set; } = "";
+    public string SourceUrl { get; private set; } = "";
+    public DateTimeOffset CreatedAt { get; private set; }
+    public IReadOnlyCollection<SolarMaterialPriceRecord> Prices => _prices.AsReadOnly();
+
+    public static SolarMaterialRecord Create(SolarMaterial material)
+    {
+        ArgumentNullException.ThrowIfNull(material);
+
+        var record = new SolarMaterialRecord
+        {
+            Id = material.Id,
+            Type = material.Type,
+            Brand = material.Brand,
+            Model = material.Model,
+            PowerW = material.PowerW,
+            TechnicalDataJson = material.TechnicalDataJson,
+            SourceUrl = material.SourceUrl,
+            CreatedAt = material.CreatedAt
+        };
+        record._prices.AddRange(material.Prices.Select(SolarMaterialPriceRecord.Create));
+        return record;
+    }
+
+    public SolarMaterialPriceRecord AddPrice(decimal amount, DateTimeOffset validFrom)
+    {
+        if (amount < 0 || decimal.Round(amount, 2) != amount)
+            throw new ArgumentOutOfRangeException(nameof(amount), "Preço deve ser não negativo e ter no máximo 2 casas decimais.");
+        if (_prices.Any(price => price.ValidFrom == validFrom))
+            throw new InvalidOperationException("Já existe preço vigente a partir desta data.");
+
+        var price = SolarMaterialPriceRecord.Create(Guid.NewGuid(), Id, amount, validFrom);
+        _prices.Add(price);
+        return price;
+    }
+}
+
+public sealed class SolarMaterialPriceRecord
+{
+    public Guid Id { get; private set; }
+    public Guid MaterialId { get; private set; }
+    public decimal Amount { get; private set; }
+    public DateTimeOffset ValidFrom { get; private set; }
+    public SolarMaterialRecord Material { get; set; } = null!;
+
+    public static SolarMaterialPriceRecord Create(Guid id, Guid materialId, decimal amount, DateTimeOffset validFrom) =>
+        new()
+        {
+            Id = id,
+            MaterialId = materialId,
+            Amount = amount,
+            ValidFrom = validFrom
+        };
+
+    public static SolarMaterialPriceRecord Create(SolarMaterialPrice price) =>
+        new()
+        {
+            Id = price.Id,
+            MaterialId = price.MaterialId,
+            Amount = price.Amount,
+            ValidFrom = price.ValidFrom
+        };
 }
 
 // Os records Solar* são o ÚNICO caminho seguro para criar e transicionar as
@@ -396,11 +556,14 @@ public sealed class SolarSizingRecord
 {
     public Guid Id { get; private set; }
     public Guid LeadId { get; private set; }
+    public Guid? DistributorId { get; private set; }
     public string Concessionaria { get; private set; } = "";
     public string Grupo { get; private set; } = "";
     public string Modalidade { get; private set; } = "";
     public string EngineVersion { get; private set; } = "";
     public string InputsJson { get; private set; } = "";
+    public string MaterialSnapshotJson { get; private set; } = "{}";
+    public string TariffSnapshotJson { get; private set; } = "{}";
     public string? ResultsJson { get; private set; }
     public SolarSizingStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
@@ -414,7 +577,10 @@ public sealed class SolarSizingRecord
         string grupo,
         string modalidade,
         string engineVersion,
-        string inputsJson)
+        string inputsJson,
+        string materialSnapshotJson = "{}",
+        string tariffSnapshotJson = "{}",
+        Guid? distributorId = null)
     {
         SolarValidation.RequireGuid(id, nameof(id), "Id é obrigatório.");
         SolarValidation.RequireGuid(leadId, nameof(leadId), "LeadId é obrigatório.");
@@ -423,17 +589,22 @@ public sealed class SolarSizingRecord
         modalidade = SolarValidation.RequireText(modalidade, nameof(modalidade), "Modalidade é obrigatória.");
         engineVersion = SolarValidation.RequireText(engineVersion, nameof(engineVersion), "Versão do motor é obrigatória.");
         inputsJson = SolarValidation.RequireJson(inputsJson, nameof(inputsJson), "Snapshot de entradas é obrigatório.");
+        materialSnapshotJson = SolarValidation.RequireJson(materialSnapshotJson, nameof(materialSnapshotJson), "Snapshot de materiais é obrigatório.");
+        tariffSnapshotJson = SolarValidation.RequireJson(tariffSnapshotJson, nameof(tariffSnapshotJson), "Snapshot tarifário é obrigatório.");
 
         var now = DateTimeOffset.UtcNow;
         return new SolarSizingRecord
         {
             Id = id,
             LeadId = leadId,
+            DistributorId = distributorId,
             Concessionaria = concessionaria,
             Grupo = grupo,
             Modalidade = modalidade,
             EngineVersion = engineVersion,
             InputsJson = inputsJson,
+            MaterialSnapshotJson = materialSnapshotJson,
+            TariffSnapshotJson = tariffSnapshotJson,
             Status = SolarSizingStatus.Draft,
             CreatedAt = now,
             UpdatedAt = now
@@ -481,6 +652,7 @@ public sealed class SolarQuoteRecord
 {
     public Guid Id { get; private set; }
     public Guid SizingId { get; private set; }
+    public string SupplierName { get; private set; } = "";
     public string ItemsJson { get; private set; } = "";
     public decimal TotalCost { get; private set; }
     public decimal MarginPercent { get; private set; }
@@ -492,6 +664,8 @@ public sealed class SolarQuoteRecord
     public SolarQuoteStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
+    public DateTimeOffset? PriceRefreshedAt { get; private set; }
+    public string? PriceRefreshedBy { get; private set; }
     public SolarSizingRecord Sizing { get; set; } = null!;
     public ICollection<ProposalRecord> Proposals { get; set; } = [];
 
@@ -506,9 +680,24 @@ public sealed class SolarQuoteRecord
         string conditionsJson,
         DateTimeOffset validUntil,
         string snapshotJson)
+        => Create(id, sizing, "Fornecedor não informado", itemsJson, totalCost, marginPercent, taxPercent, totalPrice, conditionsJson, validUntil, snapshotJson);
+
+    public static SolarQuoteRecord Create(
+        Guid id,
+        SolarSizingRecord sizing,
+        string supplierName,
+        string itemsJson,
+        decimal totalCost,
+        decimal marginPercent,
+        decimal taxPercent,
+        decimal totalPrice,
+        string conditionsJson,
+        DateTimeOffset validUntil,
+        string snapshotJson)
     {
         SolarValidation.RequireGuid(id, nameof(id), "Id é obrigatório.");
         ArgumentNullException.ThrowIfNull(sizing);
+        supplierName = SolarValidation.RequireText(supplierName, nameof(supplierName), "Fornecedor é obrigatório.");
 
         if (sizing.Status is not (SolarSizingStatus.Calculated or SolarSizingStatus.Approved))
             throw new InvalidOperationException(
@@ -528,6 +717,7 @@ public sealed class SolarQuoteRecord
         {
             Id = id,
             SizingId = sizing.Id,
+            SupplierName = supplierName,
             ItemsJson = itemsJson,
             TotalCost = totalCost,
             MarginPercent = marginPercent,
@@ -540,6 +730,24 @@ public sealed class SolarQuoteRecord
             CreatedAt = now,
             UpdatedAt = now
         };
+    }
+
+    public void RefreshPricing(string itemsJson, decimal totalCost, decimal totalPrice, string refreshedBy)
+    {
+        itemsJson = SolarValidation.RequireJson(itemsJson, nameof(itemsJson), "Itens são obrigatórios.");
+        SolarValidation.RequireMoney(totalCost, nameof(totalCost));
+        SolarValidation.RequireMoney(totalPrice, nameof(totalPrice));
+        refreshedBy = SolarValidation.RequireText(refreshedBy, nameof(refreshedBy), "Responsável pela atualização é obrigatório.");
+
+        if (Status is not SolarQuoteStatus.Draft)
+            throw new InvalidOperationException("Preços só podem ser atualizados em uma cotação em rascunho.");
+
+        ItemsJson = itemsJson;
+        TotalCost = totalCost;
+        TotalPrice = totalPrice;
+        PriceRefreshedAt = DateTimeOffset.UtcNow;
+        PriceRefreshedBy = refreshedBy;
+        Touch();
     }
 
     public void Approve(SolarSizingRecord sizing)
@@ -596,6 +804,49 @@ public sealed class SolarQuoteRecord
     }
 
     private void Touch() => UpdatedAt = DateTimeOffset.UtcNow;
+}
+
+public sealed class SolarSupplierRecord
+{
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = "";
+    public string? Website { get; private set; }
+    public string? Contact { get; private set; }
+    public string? ContactName { get; private set; }
+    public string? Phone { get; private set; }
+    public string? WhatsApp { get; private set; }
+    public string Source { get; private set; } = "Manual";
+    public string Status { get; private set; } = "Approved";
+
+    public static SolarSupplierRecord Create(Guid id, string name, string? website, string? contact, string source)
+    {
+        SolarValidation.RequireGuid(id, nameof(id), "Id é obrigatório.");
+        return new SolarSupplierRecord
+        {
+            Id = id,
+            Name = SolarValidation.RequireText(name, nameof(name), "Nome do fornecedor é obrigatório."),
+            Website = string.IsNullOrWhiteSpace(website) ? null : website.Trim(),
+            Contact = string.IsNullOrWhiteSpace(contact) ? null : contact.Trim(),
+            Source = SolarValidation.RequireText(source, nameof(source), "Fonte é obrigatória.")
+        };
+    }
+
+    public static SolarSupplierRecord Discover(Guid id, string name, string? website, string? contact, string source)
+    {
+        var supplier = Create(id, name, website, contact, source);
+        supplier.Status = "Pending";
+        return supplier;
+    }
+
+    public void Approve() => Status = "Approved";
+
+    public void Approve(string contactName, string phone, string whatsapp)
+    {
+        ContactName = SolarValidation.RequireText(contactName, nameof(contactName), "Nome do contato é obrigatório.");
+        Phone = SolarValidation.RequireText(phone, nameof(phone), "Telefone é obrigatório.");
+        WhatsApp = SolarValidation.RequireText(whatsapp, nameof(whatsapp), "WhatsApp é obrigatório.");
+        Status = "Approved";
+    }
 }
 
 public sealed class ProposalRecord
@@ -700,11 +951,42 @@ public sealed class ProposalRecord
     private void Touch() => UpdatedAt = DateTimeOffset.UtcNow;
 }
 
+public sealed class DistributorRecord
+{
+    public Guid Id { get; private set; }
+    public string AneelId { get; private set; } = "";
+    public string OfficialName { get; private set; } = "";
+    public string? Cnpj { get; private set; }
+    public bool IsActive { get; private set; } = true;
+    public DateTimeOffset LastSyncedAt { get; private set; }
+    public NpgsqlTsVector SearchVector { get; private set; } = null!;
+
+    public static DistributorRecord Create(Guid id, string aneelId, string officialName, string? cnpj = null) => new()
+    {
+        Id = id,
+        AneelId = aneelId.Trim(),
+        OfficialName = officialName.Trim(),
+        Cnpj = string.IsNullOrWhiteSpace(cnpj) ? null : cnpj.Trim(),
+        IsActive = true,
+        LastSyncedAt = DateTimeOffset.UtcNow
+    };
+
+    public void Sync(string officialName, string? cnpj = null)
+    {
+        OfficialName = officialName.Trim();
+        Cnpj = string.IsNullOrWhiteSpace(cnpj) ? null : cnpj.Trim();
+        LastSyncedAt = DateTimeOffset.UtcNow;
+        IsActive = true;
+    }
+}
+
 public sealed class TariffProfileRecord
 {
     private readonly List<TariffComponentRecord> _components = [];
 
     public Guid Id { get; private set; }
+    public Guid? DistributorId { get; private set; }
+    public DistributorRecord? DistributorRecord { get; private set; }
     public Distributor Distributor { get; private set; }
     public TariffGroup Group { get; private set; }
     public TariffSubgroup Subgroup { get; private set; }
@@ -735,7 +1017,8 @@ public sealed class TariffProfileRecord
         bool isComplete,
         IReadOnlyList<TariffComponent> components,
         int version = 1,
-        bool isCurrent = true)
+        bool isCurrent = true,
+        Guid? distributorId = null)
     {
         if (version < 1)
             throw new ArgumentOutOfRangeException(nameof(version), "Versão do perfil deve ser maior ou igual a 1.");
@@ -758,6 +1041,7 @@ public sealed class TariffProfileRecord
         var record = new TariffProfileRecord
         {
             Id = domain.Id,
+            DistributorId = distributorId,
             Distributor = domain.Distributor,
             Group = domain.Group,
             Subgroup = domain.Subgroup,
@@ -831,6 +1115,8 @@ public sealed class TariffComponentRecord
 public sealed class GridCompensationRuleRecord
 {
     public Guid Id { get; private set; }
+    public Guid? DistributorId { get; private set; }
+    public DistributorRecord? DistributorRecord { get; private set; }
     public Distributor Distributor { get; private set; }
     public TariffGroup? Group { get; private set; }
     public TariffSubgroup? Subgroup { get; private set; }
@@ -863,7 +1149,8 @@ public sealed class GridCompensationRuleRecord
         string sourceUrl,
         string? sourceDocumentHash,
         DateTimeOffset accessedAt,
-        bool isComplete)
+        bool isComplete,
+        Guid? distributorId = null)
     {
         var domain = GridCompensationRule.Create(
             id,
@@ -881,11 +1168,13 @@ public sealed class GridCompensationRuleRecord
             sourceUrl,
             sourceDocumentHash,
             accessedAt,
-            isComplete);
+            isComplete,
+            distributorId);
 
         return new GridCompensationRuleRecord
         {
             Id = domain.Id,
+            DistributorId = domain.DistributorId,
             Distributor = domain.Distributor,
             Group = domain.Group,
             Subgroup = domain.Subgroup,
@@ -929,6 +1218,7 @@ public sealed class LeadActivityRecord
     public string Type { get; set; } = "";
     public string Description { get; set; } = "";
     public DateTimeOffset CreatedAt { get; set; }
+    [JsonIgnore]
     public LeadRecord Lead { get; set; } = null!;
 }
 
@@ -942,6 +1232,7 @@ public sealed class LeadTaskRecord
     public DateTimeOffset? CompletedAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    [JsonIgnore]
     public LeadRecord Lead { get; set; } = null!;
 }
 

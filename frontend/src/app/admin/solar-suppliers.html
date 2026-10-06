@@ -1,0 +1,49 @@
+<main class="supplier-page">
+  <header>
+    <p>Workspace / Fornecedores</p>
+    <h1>Fornecedores solares</h1>
+    <a href="/admin/cotacao">Voltar para cotação</a>
+  </header>
+  <section class="search">
+    <h2>Pesquisa assistida por IA</h2>
+    <p>A IA sugere candidatos. Nada entra na listbox antes da aprovação.</p>
+    <div>
+      <input [(ngModel)]="query" /><button (click)="discover()">Pesquisar mercado ↗</button>
+    </div>
+  </section>
+  @if (error()) {
+    <p class="feedback">{{ error() }}</p>
+  }
+  <section class="supplier-list">
+    <h2>Revisão</h2>
+    @for (supplier of suppliers(); track supplier.id) {
+      <article>
+        <div>
+          <strong>{{ supplier.name }}</strong
+          ><small>{{ supplier.website || 'Fonte: ' + supplier.source }}</small>
+        </div>
+        <span class="status" [class.approved]="supplier.status === 'Approved'">{{
+          supplier.status
+        }}</span>
+        @if (supplier.status === 'Pending') {
+          <button (click)="selected = supplier">Completar contato</button>
+        }
+      </article>
+    } @empty {
+      <p>Nenhum fornecedor cadastrado.</p>
+    }
+  </section>
+  @if (selected; as supplier) {
+    <section class="approval">
+      <h2>Aprovar {{ supplier.name }}</h2>
+      <p>Complete os dados obrigatórios para liberar o fornecedor na cotação.</p>
+      <label>Nome do contato<input [(ngModel)]="contactName" /></label
+      ><label>Telefone<input [(ngModel)]="phone" /></label
+      ><label>WhatsApp<input [(ngModel)]="whatsapp" /></label>
+      <div>
+        <button (click)="approve()">Aprovar fornecedor</button
+        ><button class="cancel" (click)="selected = null">Cancelar</button>
+      </div>
+    </section>
+  }
+</main>

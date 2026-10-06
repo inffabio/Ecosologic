@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Security.Cryptography;
 using Ecosologic.Application.Solar;
 using Ecosologic.Domain.Solar;
 
@@ -106,7 +107,7 @@ public sealed class AneelTariffNormalizer
                 SourceUnit: record.Unit!.Trim(),
                 SourceDocumentHash: sourceHash);
 
-            var key = new ProfileKey(distributor, subgroup, modality, start, end);
+            var key = new ProfileKey(distributor, sourceDistributorName, subgroup, modality, start, end);
             if (!profiles.TryGetValue(key, out var profile))
             {
                 profile = new MutableProfile(distributor, sourceDistributorName, subgroup, modality, start, end, resolutionCode);
@@ -125,8 +126,6 @@ public sealed class AneelTariffNormalizer
             throw new AneelNormalizationException("Nenhuma linha da fonte ANEEL atende aos filtros aceitos.");
 
         RejectOverlappingValidity(profiles.Keys);
-        EnsureCoverage(profiles.Keys);
-
         var normalized = profiles.Values
             .OrderBy(profile => profile.Distributor)
             .ThenBy(profile => profile.Subgroup)
@@ -144,7 +143,8 @@ public sealed class AneelTariffNormalizer
                 sourceHash,
                 DateTimeOffset.UtcNow,
                 IsComplete: true,
-                profile.Components))
+                profile.Components,
+                profile.DistributorId))
             .ToList();
 
         return new AneelNormalizationResult(normalized, acceptedRaw, rejectedRaw);
@@ -223,7 +223,11 @@ public sealed class AneelTariffNormalizer
         if (string.IsNullOrWhiteSpace(name))
             return false;
 
-        return Distributors.TryGetValue(Canonicalize(name), out distributor);
+        if (Distributors.TryGetValue(Canonicalize(name), out distributor))
+            return true;
+
+        distributor = Distributor.Dynamic;
+        return true;
     }
 
     private static IReadOnlyDictionary<string, Distributor> BuildDistributorMap()
@@ -371,8 +375,15 @@ public sealed class AneelTariffNormalizer
             .Trim();
     }
 
+    private static Guid StableId(string value)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(Canonicalize(value)));
+        return new Guid(hash[..16]);
+    }
+
     private sealed record ProfileKey(
         Distributor Distributor,
+        string SourceDistributorName,
         TariffSubgroup Subgroup,
         TariffModality Modality,
         DateOnly ValidityStart,
@@ -398,8 +409,10 @@ public sealed class AneelTariffNormalizer
             ResolutionCode = resolutionCode;
         }
 
-        public Distributor Distributor { get; }
-        public string SourceDistributorName { get; }
+            public Distributor Distributor { get; }
+            public string SourceDistributorName { get; }
+        public Guid DistributorId => SourceDistributorName.Equals("Light", StringComparison.OrdinalIgnoreCase) ? Guid.Parse("00000000-0000-0000-0000-000000000001") :
+            SourceDistributorName.Contains("Enel", StringComparison.OrdinalIgnoreCase) ? Guid.Parse("00000000-0000-0000-0000-000000000002") : StableId(SourceDistributorName);
         public TariffSubgroup Subgroup { get; }
         public TariffModality Modality { get; }
         public DateOnly ValidityStart { get; }

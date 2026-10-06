@@ -1,0 +1,85 @@
+{
+  "name": "Ecosologic | Enriquecimento Regional de Leads",
+  "nodes": [
+    {
+      "parameters": {"httpMethod":"POST","path":"regional-lead-enrichment","authentication":"headerAuth","responseMode":"lastNode"},
+      "id":"regional-webhook","name":"Regional Lead Webhook","type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"webhookId":"regional-lead-enrichment",
+      "credentials":{"httpHeaderAuth":{"id":"70CckIG8H1NPw8uv","name":"Regional Lead Webhook Token"}}
+    },
+    {
+      "parameters":{"jsCode":"const body=$json.body??$json; const cities=[...new Set((Array.isArray(body.cities)?body.cities:[]).map(x=>String(x??'').trim()).filter(Boolean))].slice(0,20); if(!cities.length) throw new Error('Informe ao menos uma cidade em cities.'); const n=Number(body.maxLeadsPerCity??10); return [{json:{cities,maxLeadsPerCity:Math.max(1,Math.min(Number.isFinite(n)?n:10,10))}}];"},
+      "id":"normalize-request","name":"Normalize Regional Request","type":"n8n-nodes-base.code","typeVersion":2,"position":[220,0]
+    },
+    {
+      "parameters":{"method":"POST","url":"http://api:8080/api/auth/login","authentication":"genericCredentialType","genericAuthType":"httpBasicAuth","sendBody":true,"specifyBody":"json","jsonBody":"={{JSON.stringify({})}}"},
+      "id":"crm-login","name":"Authenticate CRM","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[440,0],
+      "credentials":{"httpBasicAuth":{"id":"lDXCIibuvm4aYMP8","name":"Regional Lead CRM Admin"}}
+    },
+    {
+      "parameters":{"method":"GET","url":"http://api:8080/api/leads?stage=New&page=1&pageSize=50","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Authorization","value":"={{'Bearer '+$json.token}}"}]}},
+      "id":"get-leads","name":"Get Eligible Leads","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[660,0]
+    },
+    {
+      "parameters":{"jsCode":"const input=$('Normalize Regional Request').first().json; const leads=($json.items??[]).filter(x=>!String(x.notes??'').includes('<!-- AI_ENRICHMENT_START -->')); return input.cities.map(city=>({json:{city,maxLeadsPerCity:input.maxLeadsPerCity,leads,query:`\\\"quero instalar energia solar\\\" OR \\\"orçamento energia solar\\\" OR \\\"sistema fotovoltaico\\\" \\\"${city}\\\"`}}));"},
+      "id":"build-city-searches","name":"Build City Searches","type":"n8n-nodes-base.code","typeVersion":2,"position":[880,0]
+    },
+    {
+      "parameters":{"method":"GET","url":"https://api.search.brave.com/res/v1/web/search","sendQuery":true,"queryParameters":{"parameters":[{"name":"q","value":"={{$json.query}}"},{"name":"count","value":"={{$json.maxLeadsPerCity}}"}]},"sendHeaders":true,"headerParameters":{"parameters":[{"name":"Accept","value":"application/json"}]},"authentication":"genericCredentialType","genericAuthType":"httpHeaderAuth"},
+      "id":"brave-search","name":"Brave Public Regional Search","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[1100,0],
+      "credentials":{"httpHeaderAuth":{"id":"L8riSTio6QQbYw73","name":"Regional Lead Brave Search"}}
+    },
+    {
+      "parameters":{"jsCode":"const source=$('Build City Searches').item.json; const results=($json.web?.results??[]).map(x=>({title:x.title,url:x.url,description:x.description})); return [{json:{city:source.city,leads:source.leads,results}}];"},
+      "id":"prepare-ai","name":"Prepare Regional AI Input","type":"n8n-nodes-base.code","typeVersion":2,"position":[1320,0]
+    },
+    {
+      "parameters":{"method":"POST","url":"https://9router.ecosologic.com.br/v1/chat/completions","authentication":"genericCredentialType","genericAuthType":"httpHeaderAuth","sendBody":true,"specifyBody":"json","jsonBody":"={{JSON.stringify({model:'ecosologicComboAI',temperature:0,messages:[{role:'system',content:'Analise sinais públicos de interesse em energia solar. Associe somente IDs existentes. Responda somente JSON válido no formato {matches:[{leadId,city,intent,potential,evidence,evidenceUrl,summary,nextAction}]}. Não invente fatos, telefones ou e-mails.'},{role:'user',content:JSON.stringify($json)}]})}}"},
+      "id":"regional-ai","name":"Analyze Regional Intent","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[1540,0],
+      "credentials":{"httpHeaderAuth":{"id":"46mZBdgxcCfDJVxG","name":"Regional Lead 9Router"}}
+    },
+    {
+      "parameters":{"jsCode":"const text=String($json.choices?.[0]?.message?.content??'').replace(/^```json\\s*/i,'').replace(/\\s*```$/i,'').trim(); let parsed=null; try{parsed=JSON.parse(text);}catch{const a=text.indexOf('{'),b=text.lastIndexOf('}');if(a>=0&&b>a){try{parsed=JSON.parse(text.slice(a,b+1));}catch{}}} const source=$('Prepare Regional AI Input').item.json; const leads=new Map(source.leads.map(x=>[String(x.id),x])); const matches=(parsed?.matches??[]).filter(x=>leads.has(String(x.leadId))&&String(x.city??'').trim().toLowerCase()===source.city.trim().toLowerCase()); if(!matches.length)return[{json:{skip:true,city:source.city}}]; return matches.map(match=>{const lead=leads.get(String(match.leadId)); const block=`<!-- AI_ENRICHMENT_START -->\\nEnriquecimento regional (${source.city})\\nIntenção: ${match.intent??'não classificada'}\\nPotencial: ${match.potential??'não classificado'}\\nEvidência pública: ${match.evidence??'não informada'}\\nFonte: ${match.evidenceUrl??'não informada'}\\nResumo: ${match.summary??'não informado'}\\nPróxima ação: ${match.nextAction??'realizar contato consultivo'}\\n<!-- AI_ENRICHMENT_END -->`; const old=String(lead.notes??'').replace(/\\n?<!-- AI_ENRICHMENT_START -->[\\s\\S]*?<!-- AI_ENRICHMENT_END -->/g,'').trim(); return{json:{leadId:lead.id,leadName:lead.name,notes:`${old}${old?'\\n\\n':''}${block}`.slice(0,4000),activity:`AI_ENRICHMENT | ${source.city} | ${match.intent??'interesse solar'} | ${match.summary??'Evidência pública encontrada.'}`.slice(0,4000),taskTitle:`Revisar lead solar - ${lead.name}`.slice(0,160),taskDescription:`${match.nextAction??'Realizar contato consultivo.'} Fonte: ${match.evidenceUrl??'não informada'}`.slice(0,2000)}};});"},
+      "id":"parse-enrichment","name":"Prepare CRM Enrichment","type":"n8n-nodes-base.code","typeVersion":2,"position":[1760,0]
+    },
+    {
+      "parameters":{"conditions":{"options":{"caseSensitive":true,"typeValidation":"strict","version":2},"conditions":[{"id":"has-match","leftValue":"={{Boolean($json.leadId)}}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"}},
+      "id":"has-match","name":"Has Enrichment Match?","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[1980,0]
+    },
+    {
+      "parameters":{"method":"PATCH","url":"={{'http://api:8080/api/leads/'+$json.leadId}}","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Authorization","value":"={{'Bearer '+$('Authenticate CRM').first().json.token}}"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{JSON.stringify({stage:null,notes:$json.notes})}}"},
+      "id":"save-notes","name":"Save Lead Intelligence","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[2200,-100]
+    },
+    {
+      "parameters":{"method":"POST","url":"={{'http://api:8080/api/leads/'+$('Prepare CRM Enrichment').item.json.leadId+'/activities'}}","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Authorization","value":"={{'Bearer '+$('Authenticate CRM').first().json.token}}"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{JSON.stringify({type:'AIEnrichment',description:$('Prepare CRM Enrichment').item.json.activity})}}"},
+      "id":"add-activity","name":"Record Enrichment Activity","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[2420,-100]
+    },
+    {
+      "parameters":{"method":"POST","url":"={{'http://api:8080/api/leads/'+$('Prepare CRM Enrichment').item.json.leadId+'/tasks'}}","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Authorization","value":"={{'Bearer '+$('Authenticate CRM').first().json.token}}"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{JSON.stringify({title:$('Prepare CRM Enrichment').item.json.taskTitle,description:$('Prepare CRM Enrichment').item.json.taskDescription,dueAt:new Date(Date.now()+86400000).toISOString()})}}"},
+      "id":"add-task","name":"Create Follow-up Task","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[2640,-100]
+    },
+    {
+      "parameters":{"jsCode":"const items=$('Prepare CRM Enrichment').all(); return[{json:{status:'completed',enrichedLeads:items.filter(x=>x.json.leadId).length,message:`${items.filter(x=>x.json.leadId).length} lead(s) enriquecido(s) com pesquisa pública do Brave.`}}];"},
+      "id":"summary","name":"Regional Enrichment Summary","type":"n8n-nodes-base.code","typeVersion":2,"position":[2860,-100]
+    },
+    {
+      "parameters":{"jsCode":"return[{json:{status:'completed',enrichedLeads:0,message:'Nenhum lead com evidência pública suficiente para esta cidade.'}}];"},
+      "id":"no-match","name":"Regional No-match Summary","type":"n8n-nodes-base.code","typeVersion":2,"position":[2200,180]
+    }
+  ],
+  "connections":{
+    "Regional Lead Webhook":{"main":[[{"node":"Normalize Regional Request","type":"main","index":0}]]},
+    "Normalize Regional Request":{"main":[[{"node":"Authenticate CRM","type":"main","index":0}]]},
+    "Authenticate CRM":{"main":[[{"node":"Get Eligible Leads","type":"main","index":0}]]},
+    "Get Eligible Leads":{"main":[[{"node":"Build City Searches","type":"main","index":0}]]},
+    "Build City Searches":{"main":[[{"node":"Brave Public Regional Search","type":"main","index":0}]]},
+    "Brave Public Regional Search":{"main":[[{"node":"Prepare Regional AI Input","type":"main","index":0}]]},
+    "Prepare Regional AI Input":{"main":[[{"node":"Analyze Regional Intent","type":"main","index":0}]]},
+    "Analyze Regional Intent":{"main":[[{"node":"Prepare CRM Enrichment","type":"main","index":0}]]},
+    "Prepare CRM Enrichment":{"main":[[{"node":"Has Enrichment Match?","type":"main","index":0}]]},
+    "Has Enrichment Match?":{"main":[[{"node":"Save Lead Intelligence","type":"main","index":0}],[{"node":"Regional No-match Summary","type":"main","index":0}]]},
+    "Save Lead Intelligence":{"main":[[{"node":"Record Enrichment Activity","type":"main","index":0}]]},
+    "Record Enrichment Activity":{"main":[[{"node":"Create Follow-up Task","type":"main","index":0}]]},
+    "Create Follow-up Task":{"main":[[{"node":"Regional Enrichment Summary","type":"main","index":0}]]}
+  },
+  "settings":{"executionOrder":"v1"}
+}

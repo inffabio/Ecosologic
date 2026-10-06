@@ -1,0 +1,114 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f3f5f1;
+  color: #152832;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.supplier-page {
+  max-width: 900px;
+  margin: auto;
+  padding: 3rem 1.2rem;
+}
+header {
+  border-bottom: 1px solid #cbd5ce;
+  padding-bottom: 1.5rem;
+}
+header p {
+  color: #66806e;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+h1,
+h2 {
+  font-family: 'Manrope', sans-serif;
+  letter-spacing: -0.04em;
+}
+header a {
+  color: #536f5a;
+  font-size: 0.8rem;
+}
+.search,
+.approval {
+  background: #fff;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+.search p,
+.approval p {
+  color: #65736d;
+}
+.search div {
+  display: flex;
+  gap: 0.7rem;
+}
+input {
+  border: 1px solid #c7d2cb;
+  padding: 0.75rem;
+  flex: 1;
+  font: inherit;
+}
+button {
+  border: 0;
+  background: #142e3a;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.feedback {
+  background: #e4eee2;
+  padding: 0.8rem;
+}
+.supplier-list {
+  margin-top: 1.5rem;
+}
+.supplier-list article {
+  background: #fff;
+  border-bottom: 1px solid #dfe6e0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.supplier-list article div {
+  flex: 1;
+  display: grid;
+  gap: 0.25rem;
+}
+.supplier-list small {
+  color: #76837d;
+}
+.status {
+  font-size: 0.65rem;
+  color: #a96b25;
+}
+.status.approved {
+  color: #42714e;
+}
+.approval {
+  display: grid;
+  gap: 0.8rem;
+}
+.approval label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+.approval div {
+  display: flex;
+  gap: 0.6rem;
+}
+.cancel {
+  background: #87948d;
+}
+@media (max-width: 600px) {
+  .search div {
+    display: grid;
+  }
+  .supplier-list article {
+    align-items: start;
+    flex-wrap: wrap;
+  }
+}

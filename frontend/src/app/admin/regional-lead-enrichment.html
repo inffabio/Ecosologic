@@ -1,0 +1,41 @@
+<main class="regional-page">
+  <a class="back" routerLink="/admin/crm">← Voltar para visão geral</a>
+  <header class="regional-header">
+    <div>
+      <p class="kicker">INTELIGÊNCIA COMERCIAL</p>
+      <h1>Prospecção regional</h1>
+      <p class="subtitle">Encontre sinais públicos de interesse em energia solar nas cidades que você atende.</p>
+    </div>
+    <div class="signal-mark" aria-hidden="true">↗</div>
+  </header>
+
+  <section class="regional-layout">
+    <form class="regional-form" (submit)="$event.preventDefault(); run()">
+      <label for="cities">Cidades para prospectar</label>
+      <textarea id="cities" rows="7" [value]="cities()" (input)="cities.set($any($event.target).value)" aria-describedby="cities-help"></textarea>
+      <p id="cities-help" class="field-help">Uma cidade por linha. Você também pode separar por vírgulas.</p>
+
+      <label for="city-limit">Leads por cidade</label>
+      <input id="city-limit" type="number" min="1" max="10" [value]="maxLeadsPerCity()" (input)="maxLeadsPerCity.set(+$any($event.target).value)" />
+      <p class="field-help">O limite operacional é de 1 a 10 resultados por cidade.</p>
+
+      <button class="primary-action" type="submit" [disabled]="running()">
+        {{ running() ? 'Pesquisando cidades...' : 'Pesquisar cidades' }}
+      </button>
+      <p class="privacy-note">Pesquisa somente páginas públicas. Nenhuma mensagem é enviada aos leads.</p>
+    </form>
+
+    <aside class="regional-brief">
+      <span class="brief-line"></span>
+      <h2>Da cidade à próxima conversa.</h2>
+      <p>O Brave encontra evidências públicas. A análise organiza intenção, potencial e próxima ação no CRM.</p>
+      <dl><dt>Entrada</dt><dd>Cidades prioritárias</dd><dt>Saída</dt><dd>Resumo, evidência e tarefa</dd></dl>
+    </aside>
+  </section>
+
+  <section class="regional-status" aria-live="polite">
+    @if (running()) { <p class="status-running">A busca está percorrendo as cidades selecionadas...</p> }
+    @if (result(); as response) { <p class="status-success"><strong>{{ response.enrichedLeads }}</strong> lead(s) enriquecido(s). {{ response.message }}</p> }
+    @if (error()) { <p class="status-error">{{ error() }}</p> }
+  </section>
+</main>

@@ -52,7 +52,9 @@ public sealed class SolarSizingResult
         double worstMonthGenerationKWh,
         double worstMonthConsumptionKWh,
         double worstMonthDeficitKWh,
-        IReadOnlyList<SolarSizingAlert> alerts)
+        IReadOnlyList<SolarSizingAlert> alerts,
+        SolarSizingCharts charts,
+        IReadOnlyList<double> monthlyConsumptionKWh)
     {
         MonthlyGenerationKWh = monthlyGenerationKWh;
         AnnualGenerationKWh = annualGenerationKWh;
@@ -75,6 +77,8 @@ public sealed class SolarSizingResult
         WorstMonthConsumptionKWh = worstMonthConsumptionKWh;
         WorstMonthDeficitKWh = worstMonthDeficitKWh;
         Alerts = alerts;
+        Charts = charts;
+        MonthlyConsumptionKWh = monthlyConsumptionKWh;
     }
 
     public IReadOnlyList<double> MonthlyGenerationKWh { get; }
@@ -98,6 +102,8 @@ public sealed class SolarSizingResult
     public double WorstMonthConsumptionKWh { get; }
     public double WorstMonthDeficitKWh { get; }
     public IReadOnlyList<SolarSizingAlert> Alerts { get; }
+    public SolarSizingCharts Charts { get; }
+    public IReadOnlyList<double> MonthlyConsumptionKWh { get; }
     public bool HasBlockingAlert => Alerts.Any(a => a.Severity == SolarSizingAlertSeverity.Blocking);
 
     internal static SolarSizingResult Create(
@@ -121,7 +127,9 @@ public sealed class SolarSizingResult
         double worstMonthGenerationKWh,
         double worstMonthConsumptionKWh,
         double worstMonthDeficitKWh,
-        IReadOnlyList<SolarSizingAlert> alerts) =>
+        IReadOnlyList<SolarSizingAlert> alerts,
+        SolarSizingCharts charts,
+        IReadOnlyList<double> monthlyConsumptionKWh) =>
         new(
             RequireFiniteSeries(monthlyGenerationKWh, nameof(MonthlyGenerationKWh)),
             RequireFinite(annualGenerationKWh, nameof(AnnualGenerationKWh)),
@@ -143,7 +151,9 @@ public sealed class SolarSizingResult
             RequireFinite(worstMonthGenerationKWh, nameof(WorstMonthGenerationKWh)),
             RequireFinite(worstMonthConsumptionKWh, nameof(WorstMonthConsumptionKWh)),
             RequireFinite(worstMonthDeficitKWh, nameof(WorstMonthDeficitKWh)),
-            alerts);
+             alerts,
+             charts,
+             RequireFiniteSeries(monthlyConsumptionKWh, nameof(MonthlyConsumptionKWh)));
 
     // Validação final: nenhum valor numérico do resultado pode ser NaN/Infinity.
     // Overflow silencioso nos intermediários é rejeitado antes de retornar.

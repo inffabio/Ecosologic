@@ -18,9 +18,11 @@ public sealed class GridCompensationRule
         string sourceUrl,
         string? sourceDocumentHash,
         DateTimeOffset accessedAt,
-        bool isComplete)
+        bool isComplete,
+        Guid? distributorId)
     {
         Id = id;
+        DistributorId = distributorId;
         Distributor = distributor;
         Group = group;
         Subgroup = subgroup;
@@ -39,6 +41,7 @@ public sealed class GridCompensationRule
     }
 
     public Guid Id { get; }
+    public Guid? DistributorId { get; }
     public Distributor Distributor { get; }
     public TariffGroup Group { get; }
     public TariffSubgroup Subgroup { get; }
@@ -71,7 +74,8 @@ public sealed class GridCompensationRule
         string sourceUrl,
         string? sourceDocumentHash,
         DateTimeOffset accessedAt,
-        bool isComplete)
+        bool isComplete,
+        Guid? distributorId = null)
     {
         TariffValidation.RequireGuid(id, nameof(id), "Id da regra é obrigatório.");
 
@@ -109,6 +113,7 @@ public sealed class GridCompensationRule
             sourceUrl,
             sourceDocumentHash,
             accessedAt,
-            isComplete);
+            isComplete,
+            distributorId);
     }
 }

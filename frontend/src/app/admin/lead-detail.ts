@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Lead, LeadActivity, LeadService, LeadTask } from '../lead.service';
 
-@Component({ selector: 'app-lead-detail', standalone: true, imports: [RouterLink, DatePipe], templateUrl: './lead-detail.html', styleUrl: './lead-detail.scss' })
+@Component({ selector: 'app-lead-detail', standalone: true, imports: [RouterLink, DatePipe], templateUrl: './lead-detail.html', styleUrls: ['./lead-detail.scss', './lead-intelligence.scss'] })
 export class LeadDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(LeadService);
@@ -30,6 +30,7 @@ export class LeadDetail implements OnInit {
   readonly newTaskDue = signal('');
   readonly addingTask = signal(false);
   readonly taskAddError = signal('');
+  readonly intelligence = computed(() => parseAiEnrichment(this.note()));
   readonly stageOptions = [
     { value: 'New', label: 'Novo lead' },
     { value: 'Contacted', label: 'Em contato' },
@@ -226,4 +227,34 @@ export class LeadDetail implements OnInit {
     if (isNaN(date.getTime())) return null;
     return date.toISOString();
   }
+}
+
+export interface AiEnrichment {
+  city: string;
+  intent: string;
+  potential: string;
+  evidence: string;
+  source: string;
+  summary: string;
+  nextAction: string;
+}
+
+export function parseAiEnrichment(notes: string): AiEnrichment | null {
+  const match = notes.match(/<!-- AI_ENRICHMENT_START -->([\s\S]*?)<!-- AI_ENRICHMENT_END -->/);
+  if (!match) return null;
+  const values = new Map<string, string>();
+  for (const line of match[1].split('\n').map(value => value.trim())) {
+    const separator = line.indexOf(':');
+    if (separator > 0) values.set(line.slice(0, separator).trim(), line.slice(separator + 1).trim());
+  }
+  const city = match[1].match(/Enriquecimento regional \((.*?)\)/)?.[1] ?? '';
+  return {
+    city,
+    intent: values.get('Intenção') ?? '',
+    potential: values.get('Potencial') ?? '',
+    evidence: values.get('Evidência pública') ?? '',
+    source: values.get('Fonte') ?? '',
+    summary: values.get('Resumo') ?? '',
+    nextAction: values.get('Próxima ação') ?? '',
+  };
 }

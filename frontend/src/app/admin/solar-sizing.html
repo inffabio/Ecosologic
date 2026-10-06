@@ -1,0 +1,222 @@
+<section class="sizing-shell">
+  <aside class="sizing-rail">
+    <div class="rail-brand"><img src="assets/brand/logo.png" alt="Ecosologic" /></div>
+    <p class="rail-label">Workspace</p>
+    <a href="/admin/crm">▦ <span>Visão geral</span></a>
+    <a class="active" href="/admin/dimensionamento">⌁ <span>Dimensionamentos</span></a>
+    <a href="/admin/fio-b">◌ <span>Projeção Fio B</span></a>
+    <a href="/admin/leads">↗ <span>Leads</span></a>
+    <a href="/admin/propostas">▤ <span>Propostas</span></a>
+    <div class="rail-footer">
+      <span>FA</span>
+      <div><strong>Fabio</strong><small>Administrador</small></div>
+    </div>
+  </aside>
+  <main>
+    <header class="sizing-header">
+      <div>
+        <p>Workspace / Dimensionamento</p>
+        <h1>Leitura técnica do imóvel</h1>
+      </div>
+      <span class="engine-pill">MOTOR 1.0.0</span>
+    </header>
+    <div class="intro">
+      <div>
+        <span class="kicker">CONSULTA INTERNA</span>
+        <h2>Doze meses contam uma história melhor.</h2>
+        <p>
+          Registre a fatura, confirme as premissas e deixe o motor revelar o sistema antes da
+          conversa comercial.
+        </p>
+      </div>
+      <div class="sun-orbit" aria-hidden="true">◌</div>
+    </div>
+    @if (error()) {
+      <p class="feedback error" role="alert">{{ error() }}</p>
+    }
+    @if (message()) {
+      <p class="feedback success" role="status">{{ message() }}</p>
+    }
+    <section class="workspace-grid">
+      <form class="form-column" (submit)="$event.preventDefault(); saveAndCalculate()">
+        <fieldset>
+          <legend>Contexto do lead</legend>
+          <div class="field-grid">
+            <label
+              >Lead ID<input name="leadId" [(ngModel)]="leadId" placeholder="UUID do lead" /></label
+            ><label
+              >Data de protocolo<input
+                type="date"
+                name="protocolDate"
+                [(ngModel)]="protocolDate" /></label
+            ><label
+              >Distribuidora<input name="distributorQuery" [(ngModel)]="distributorQuery" (input)="searchDistributors()" placeholder="Digite o nome da concessionária" autocomplete="off" />@if (distributors().length) {<span class="suggestions">@for (item of distributors(); track item.id) {<button type="button" (click)="selectDistributor(item)">{{ item.officialName }}</button>}</span>}</label
+            ><label
+              >Grupo<select name="group" [(ngModel)]="group">
+                <option>B</option>
+                <option>A</option>
+              </select></label
+            ><label>Modalidade<input name="modality" [(ngModel)]="modality" /></label
+            ><label
+              >Ligação<select name="connection" [(ngModel)]="connection">
+                <option>Monofasica</option>
+                <option>Bifasica</option>
+                <option>Trifasica</option>
+              </select></label
+            >
+          </div>
+          <label
+            >Endereço<input name="address" [(ngModel)]="address" placeholder="Rua, número, cidade"
+          /></label>
+        </fieldset>
+        <fieldset>
+          <legend>Fatura mensal <small>kWh e R$</small></legend>
+          <div class="month-table">
+            <div class="table-head"><span>Mês</span><span>Consumo</span><span>Fatura</span><span>Com solar</span></div>
+            @for (month of months; track month; let i = $index) {
+              <div class="month-row">
+                <strong>{{ month }}</strong
+                ><input
+                  type="number"
+                  min="0"
+                  name="consumption{{ i }}"
+                  [(ngModel)]="consumption[i]"
+                /><input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  name="bill{{ i }}"
+                  [(ngModel)]="bills[i]"
+                /><input type="number" min="0" step="0.01" name="billWithSolar{{ i }}" [(ngModel)]="billsWithSolar[i]" />
+              </div>
+            }
+          </div>
+          <label>Investimento total (equipamentos + mão de obra)<input type="number" min="0" step="0.01" name="investmentAmount" [(ngModel)]="investmentAmount" /></label>
+        </fieldset>
+        <fieldset>
+          <legend>Premissas do módulo</legend>
+          <label class="material-picker"
+            >Material confirmado
+            <select name="moduleMaterialId" [(ngModel)]="moduleMaterialId">
+              <option value="">Informar equipamento livremente</option>
+              @for (material of materials(); track material.id) {
+                <option [value]="material.id">
+                  {{ material.brand }} · {{ material.model }} · {{ material.powerW }} W
+                </option>
+              }
+            </select></label
+          >
+          <div class="field-grid three">
+            <label
+              >Potência (Wp)<input
+                type="number"
+                name="modulePower"
+                [(ngModel)]="modulePower" /></label
+            ><label>Voc (V)<input type="number" name="moduleVoc" [(ngModel)]="moduleVoc" /></label
+            ><label>Vmp (V)<input type="number" name="moduleVmp" [(ngModel)]="moduleVmp" /></label
+            ><label>Isc (A)<input type="number" name="moduleIsc" [(ngModel)]="moduleIsc" /></label
+            ><label>Imp (A)<input type="number" name="moduleImp" [(ngModel)]="moduleImp" /></label
+            ><label
+              >Área (m²)<input type="number" name="moduleArea" [(ngModel)]="moduleArea"
+            /></label>
+          </div>
+          <div class="field-grid">
+            <label>Orientação<input name="orientation" [(ngModel)]="orientation" /></label
+            ><label
+              >Inclinação (°)<input
+                type="number"
+                name="inclination"
+                [(ngModel)]="inclination" /></label
+            ><label
+              >Área disponível (m²)<input
+                type="number"
+                name="availableArea"
+                [(ngModel)]="availableArea"
+            /></label>
+          </div>
+        </fieldset>
+        <button class="primary-action" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Calculando...' : 'Salvar e calcular dimensionamento' }} <span>↗</span>
+        </button>
+      </form>
+      <section class="result-column" aria-live="polite">
+        @if (!result()) {
+          <div class="empty-result">
+            <span>◎</span>
+            <h3>O resultado aparece aqui</h3>
+            <p>
+              Preencha os dados da fatura e confirme as premissas para abrir a leitura de geração.
+            </p>
+          </div>
+        }
+        @if (result(); as sizing) {
+          <div class="result-head">
+            <div>
+              <span class="kicker">RESULTADO DO MOTOR</span>
+              <h2>Uma primeira leitura, sem promessa vazia.</h2>
+            </div>
+            <span class="status-dot">CALCULADO</span>
+          </div>
+          <div class="result-metrics">
+            <div>
+              <small>Geração anual</small
+              ><strong>{{ sizing.annualGenerationKWh | number: '1.0-0' }} <em>kWh</em></strong>
+            </div>
+            <div>
+              <small>Sistema instalado</small
+              ><strong>{{ sizing.installedKwp | number: '1.1-1' }} <em>kWp</em></strong>
+            </div>
+            <div>
+              <small>Cobertura</small
+              ><strong>{{ sizing.coverage * 100 | number: '1.0-0' }}<em>%</em></strong>
+            </div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-title">
+              <h3>Geração x consumo</h3>
+              <span>12 meses · kWh</span>
+            </div>
+            @for (series of sizing.charts.generationVsConsumption; track series.key) {
+              <div class="series">
+                <span>{{ series.key === 'generation' ? 'Geração' : 'Consumo' }}</span>
+                <div class="bars">
+                  @for (point of series.points; track point.label) {
+                    <div class="bar-wrap">
+                      <i
+                        [class.generation]="series.key === 'generation'"
+                        [style.height.%]="barHeight(point.value, series)"
+                        [title]="point.label + ': ' + point.value + ' ' + point.unit"
+                      ></i
+                      ><small>{{ point.label }}</small>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          @if (sizing.alerts.length) {
+            <div class="alerts">
+              <h3>Alertas técnicos</h3>
+              @for (alert of sizing.alerts; track alert.code) {
+                <p [class.blocking]="alert.severity === 'Blocking'">{{ alert.message }}</p>
+              }
+            </div>
+          }
+          @if (sizing.charts.annualBillComparison.length) {
+            <div class="chart-panel financial-panel"><div class="chart-title"><h3>Retorno financeiro</h3><span>economia após Fio B · 12 meses</span></div>
+              @for (series of sizing.charts.annualBillComparison; track series.key) {<div class="series"><span>{{ series.key === 'withoutSolar' ? 'Sem solar' : series.key === 'withSolar' ? 'Com solar + Fio B' : 'Economia líquida' }}</span><div class="bars">@for (point of series.points; track point.label) {<div class="bar-wrap"><i [class.generation]="series.key === 'savings'" [style.height.%]="barHeight(point.value, series)" [title]="point.label + ': R$ ' + point.value"></i><small>{{ point.label }}</small></div>}</div></div>}
+            </div>
+          }
+          @if (sizing.charts.financialCashFlow.length) {
+            <div class="chart-panel financial-panel"><div class="chart-title"><h3>Fluxo de caixa acumulado</h3><span>investimento, equipamentos e mão de obra</span></div>@for (series of sizing.charts.financialCashFlow; track series.key) {<div class="series"><span>Payback acumulado</span><div class="bars">@for (point of series.points; track point.label) {<div class="bar-wrap"><i class="cash" [class.positive]="point.value >= 0" [style.height.%]="barHeight(point.value < 0 ? -point.value : point.value, series)" [title]="point.label + ': R$ ' + point.value"></i><small>{{ point.label }}</small></div>}</div></div>}</div>
+          }
+        }
+      </section>
+      @if (result()) {
+        <a class="quote-link" [href]="'/admin/cotacao?sizingId=' + draftId()"
+          >Abrir cotação comercial ↗</a
+        >
+      }
+    </section>
+  </main>
+</section>

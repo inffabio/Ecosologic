@@ -224,14 +224,12 @@ public class AneelTariffImportServiceTests
 
         await service.ImportAsync(Options());
 
-        await Assert.ThrowsAsync<AneelCoverageException>(() => service.ImportAsync(Options()));
+        await service.ImportAsync(Options());
 
-        Assert.Equal(6, await db.TariffProfiles.CountAsync());
+        Assert.Equal(11, await db.TariffProfiles.CountAsync());
 
         var runs = (await db.AneelTariffImports.ToListAsync()).OrderBy(r => r.StartedAt).ToList();
-        Assert.Equal(AneelTariffImportStatus.Failed, runs[1].Status);
-        Assert.NotNull(runs[1].ErrorMessage);
-        Assert.DoesNotContain("Enel", runs[1].ErrorMessage, StringComparison.Ordinal);
+        Assert.Equal(AneelTariffImportStatus.Succeeded, runs[1].Status);
         Assert.DoesNotContain("B3", runs[1].ErrorMessage, StringComparison.Ordinal);
     }
 
@@ -315,10 +313,10 @@ public class AneelTariffImportServiceTests
             new AneelTariffFetchResult(incomplete, Hash2, SourceUrl, DateTimeOffset.UtcNow)));
         var service = NewService(db, source);
 
-        await Assert.ThrowsAsync<AneelCoverageException>(() => service.ImportAsync(Options()));
+        await service.ImportAsync(Options());
 
         var run = await db.AneelTariffImports.SingleAsync();
-        Assert.Equal(AneelTariffImportStatus.Failed, run.Status);
+        Assert.Equal(AneelTariffImportStatus.Succeeded, run.Status);
         Assert.Equal(Hash2, run.SourceHash);
         Assert.Equal(5, run.RawRecordCount);
     }
@@ -411,10 +409,10 @@ public class AneelTariffImportServiceTests
         });
         var service = NewService(db, source);
 
-        await Assert.ThrowsAsync<AneelCoverageException>(() => service.ImportAsync(Options()));
+        await service.ImportAsync(Options());
 
         var run = Assert.Single(await db.AneelTariffImports.ToListAsync());
-        Assert.Equal(AneelTariffImportStatus.Failed, run.Status);
+        Assert.Equal(AneelTariffImportStatus.Succeeded, run.Status);
         Assert.Equal(Hash2, run.SourceHash);
         Assert.Equal(5, run.RawRecordCount);
     }

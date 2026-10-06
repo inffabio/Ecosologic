@@ -1,0 +1,107 @@
+<section class="quote-shell">
+  <aside>
+    <div class="quote-brand"><img src="assets/brand/logo.png" alt="Ecosologic" /></div>
+    <p>Workspace</p>
+    <a href="/admin/crm">Visão geral</a><a href="/admin/dimensionamento">Dimensionamentos</a
+    ><a class="active" href="/admin/cotacao">Cotação</a><a href="/admin/propostas">Propostas</a>
+    <div class="quote-user">
+      <b>FA</b><span>Fabio<br /><small>Administrador</small></span>
+    </div>
+  </aside>
+  <main>
+    <header>
+      <div>
+        <p>Workspace / Cotação</p>
+        <h1>Montar cotação</h1>
+      </div>
+      <span class="quote-state">PREÇOS SNAPSHOT</span>
+    </header>
+    <section class="quote-intro">
+      <span>▣</span>
+      <div>
+        <small>CUSTO COMERCIAL</small>
+        <h2>Preço confirmado, sem atualização silenciosa.</h2>
+        <p>
+          A consulta preserva o snapshot. Use atualizar preços apenas quando decidir recalcular.
+        </p>
+      </div>
+    </section>
+    @if (error()) {
+      <p class="feedback">{{ error() }}</p>
+    }
+    <div class="quote-grid">
+      <form (submit)="$event.preventDefault(); create()">
+        <label
+          >Fornecedor cotado<select name="supplierName" [(ngModel)]="supplierName" required>
+            <option value="">Selecione o fornecedor</option>
+            @for (supplier of suppliers(); track supplier.id) {
+              <option [value]="supplier.name">{{ supplier.name }}</option>
+            }
+          </select></label
+        >
+        <label
+          >ID do dimensionamento<input
+            name="sizingId"
+            [(ngModel)]="sizingId"
+            placeholder="UUID do dimensionamento"
+            required
+        /></label>
+        <label
+          >Material confirmado<select name="moduleId" [(ngModel)]="moduleId" required>
+            <option value="">Selecione um módulo</option>
+            @for (material of materials(); track material.id) {
+              <option [value]="material.id">
+                {{ material.brand }} · {{ material.model }} ·
+                {{ material.currentPrice ?? 0 | currency: 'BRL' }}
+              </option>
+            }
+          </select></label
+        >
+        <div class="field-grid">
+          <label
+            >Quantidade<input type="number" min="1" name="quantity" [(ngModel)]="quantity" /></label
+          ><label>Validade<input type="date" name="validUntil" [(ngModel)]="validUntil" /></label
+          ><label
+            >Margem (%)<input
+              type="number"
+              min="0"
+              step="0.01"
+              name="margin"
+              [(ngModel)]="marginPercent" /></label
+          ><label
+            >Impostos (%)<input
+              type="number"
+              min="0"
+              step="0.01"
+              name="tax"
+              [(ngModel)]="taxPercent"
+          /></label>
+        </div>
+        <button [disabled]="loading()">
+          {{ loading() ? 'Calculando...' : 'Criar cotação' }} <b>↗</b>
+        </button>
+      </form>
+      @if (quote(); as result) {
+        <section class="quote-result">
+          <small>COTAÇÃO {{ result.status }}</small>
+          <p class="supplier-label">
+            Fornecedor: <strong>{{ result.supplierName }}</strong>
+          </p>
+          <h2>{{ result.totalPrice | currency: 'BRL' }}</h2>
+          <p>Custo interno: {{ result.totalCost | currency: 'BRL' }}</p>
+          <div class="quote-actions">
+            <button type="button" (click)="refreshPrices()">Atualizar preços / recalcular</button
+            ><a href="/admin/propostas">Emitir proposta ↗</a>
+          </div>
+          <pre>{{ result.itemsJson }}</pre>
+        </section>
+      } @else {
+        <section class="quote-empty">
+          <span>◌</span>
+          <h3>A cotação será calculada aqui</h3>
+          <p>O preço será calculado pelo backend a partir do catálogo confirmado.</p>
+        </section>
+      }
+    </div>
+  </main>
+</section>

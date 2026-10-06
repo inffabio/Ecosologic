@@ -56,7 +56,8 @@ public sealed record AneelNormalizedProfile(
     string? SourceDocumentHash,
     DateTimeOffset AccessedAt,
     bool IsComplete,
-    IReadOnlyList<AneelNormalizedComponent> Components);
+    IReadOnlyList<AneelNormalizedComponent> Components,
+    Guid? DistributorId = null);
 
 /// <summary>
 /// Resultado da normalização de um lote ANEEL. Além dos perfis validados, expõe as

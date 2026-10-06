@@ -1,4 +1,5 @@
 using System.Reflection;
+using Ecosologic.Application.Solar;
 using Ecosologic.Domain.Crm;
 using Ecosologic.Domain.Solar;
 using Ecosologic.Infrastructure.Persistence;
@@ -14,6 +15,85 @@ public class SolarCommercialModelsTests
     private static readonly Guid LeadId = Guid.NewGuid();
     private static readonly Guid SizingId = Guid.NewGuid();
     private static readonly Guid QuoteId = Guid.NewGuid();
+
+    private static SolarSizingRequest NewSizingRequest() => new()
+    {
+        LeadId = LeadId,
+        Distributor = "Light RJ",
+        Group = "B",
+        Modality = "Convencional",
+        Connection = "Monofasica",
+        MonthlyConsumptionKWh = Enumerable.Repeat(600m, 12).ToArray(),
+        MonthlyBillAmount = Enumerable.Repeat(580.00m, 12).ToArray(),
+        ProtocolDate = new DateOnly(2026, 9, 25),
+        Address = "Rua A, 100",
+        AssumptionsJson = "{}"
+    };
+
+    [Fact]
+    public void SolarSizingRequest_requires_exactly_twelve_months()
+    {
+        var request = NewSizingRequest();
+        request.MonthlyConsumptionKWh = Enumerable.Repeat(600m, 11).ToArray();
+
+        Assert.Throws<ArgumentException>(() => request.Validate());
+    }
+
+    [Fact]
+    public void SolarSizingRequest_rejects_negative_consumption_and_bill()
+    {
+        var request = NewSizingRequest();
+        request.MonthlyConsumptionKWh = [600m, -1m, .. Enumerable.Repeat(600m, 10)];
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => request.Validate());
+
+        request = NewSizingRequest();
+        request.MonthlyBillAmount = [580m, 580.001m, .. Enumerable.Repeat(580m, 10)];
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => request.Validate());
+    }
+
+    [Fact]
+    public void SolarSizingRequest_accepts_zero_months_and_normalizes_text()
+    {
+        var request = NewSizingRequest();
+        request.Distributor = "  Light RJ ";
+        request.MonthlyConsumptionKWh = [0m, .. Enumerable.Repeat(600m, 11)];
+        request.MonthlyBillAmount = [0m, .. Enumerable.Repeat(580m, 11)];
+
+        request.Validate();
+
+        Assert.Equal("Light RJ", request.Distributor);
+    }
+
+    [Fact]
+    public void SolarSizingRequest_requires_protocol_date_and_valid_assumptions()
+    {
+        var request = NewSizingRequest();
+        request.ProtocolDate = null;
+        Assert.Throws<ArgumentException>(() => request.Validate());
+
+        request = NewSizingRequest();
+        request.AssumptionsJson = "invalid";
+        Assert.Throws<ArgumentException>(() => request.Validate());
+    }
+
+    [Fact]
+    public void SolarSizing_snapshots_materials_and_tariff_inputs()
+    {
+        var sizing = SolarSizing.CreateDraft(
+            LeadId,
+            "Light RJ",
+            "B",
+            "Convencional",
+            "1.0.0",
+            "{}",
+            "{\"moduleId\":\"module\"}",
+            "{\"profileVersion\":3}");
+
+        Assert.Equal("{\"moduleId\":\"module\"}", sizing.MaterialSnapshotJson);
+        Assert.Equal("{\"profileVersion\":3}", sizing.TariffSnapshotJson);
+    }
 
     private static EcosologicDbContext NewNpgsqlModelContext() =>
         new(new DbContextOptionsBuilder<EcosologicDbContext>()
@@ -616,6 +696,22 @@ public class SolarCommercialModelsTests
         Assert.Equal(2, totalCost.GetScale());
         Assert.Equal(18, totalPrice.GetPrecision());
         Assert.Equal(2, totalPrice.GetScale());
+    }
+
+    [Fact]
+    public void SolarQuote_refresh_pricing_updates_only_after_explicit_action()
+    {
+        var sizing = SolarSizingRecord.Create(SizingId, LeadId, "Light RJ", "B", "Convencional", "1.0.0", "{}");
+        sizing.Calculate("{}");
+        var quote = SolarQuoteRecord.Create(QuoteId, sizing, "[{\"unitPrice\":100}]", 100m, 20m, 0m, 120m, "{}", DateTimeOffset.UtcNow.AddDays(30), "{}");
+
+        quote.RefreshPricing("[{\"unitPrice\":150}]", 150m, 180m, "admin@example.test");
+
+        Assert.Equal("[{\"unitPrice\":150}]", quote.ItemsJson);
+        Assert.Equal(150m, quote.TotalCost);
+        Assert.Equal(180m, quote.TotalPrice);
+        Assert.Equal("admin@example.test", quote.PriceRefreshedBy);
+        Assert.NotNull(quote.PriceRefreshedAt);
     }
 
     [Fact]

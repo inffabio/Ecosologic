@@ -1,0 +1,308 @@
+{
+  "name": "Ecosologic | Descoberta de Fornecedores Solares",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://api:8080/api/internal/secrets/TAVILY_API_KEY",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Internal-Secrets-Token",
+              "value": "={{$env.INTERNAL_SECRETS_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-tavily-key",
+      "name": "Get Tavily Key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify({api_key: $json.value, query: 'fornecedores de sistemas solares no Brasil', search_depth: 'advanced', max_results: 10, include_answer: false})}}",
+        "options": {}
+      },
+      "id": "tavily-search",
+      "name": "Tavily Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "continueOnFail": true,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "search-results-available",
+              "leftValue": "={{Array.isArray($json.results) && $json.results.length > 0}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "search-available",
+      "name": "Tavily Results Available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://api:8080/api/internal/secrets/BRAVE_API_KEY",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Internal-Secrets-Token",
+              "value": "={{$env.INTERNAL_SECRETS_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-brave-key",
+      "name": "Get Brave Key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 180]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.search.brave.com/res/v1/web/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "fornecedores de sistemas solares no Brasil"
+            },
+            {
+              "name": "count",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Subscription-Token",
+              "value": "={{$json.value}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "brave-search",
+      "name": "Brave Search Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 180]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://api:8080/api/internal/secrets/9ROUTER_API_KEY",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Internal-Secrets-Token",
+              "value": "={{$env.INTERNAL_SECRETS_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-9router-key",
+      "name": "Get 9Router Key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://9router.ecosologic.com.br/v1/models",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $json.value}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-9router-models",
+      "name": "Get 9Router Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tavily = $('Tavily Search').first().json.results ?? [];\nlet brave = [];\ntry { brave = $('Brave Search Fallback').first().json.web?.results ?? []; } catch {}\nconst results = tavily.length ? tavily : brave.map(item => ({title: item.title, url: item.url, content: item.description, source: item.url}));\nconst models = $json.data ?? [];\nconst model = models.find(item => item.id)?.id;\nif (!model) throw new Error('9Router não retornou modelos disponíveis.');\nreturn [{ json: { model, results } }];"
+      },
+      "id": "prepare-prompt",
+      "name": "Prepare Supplier Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://9router.ecosologic.com.br/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $('Get 9Router Key').first().json.value}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+         "jsonBody": "={{JSON.stringify({model: $json.model, temperature: 0, messages: [{role: 'system', content: 'Extraia fornecedores reais de sistemas solares. Remova duplicatas ignorando maiúsculas, minúsculas e espaços no nome. Responda somente JSON válido no formato {suppliers:[{name,website,contact,source}]}.'}, {role: 'user', content: JSON.stringify($json.results)}]})}}",
+        "options": {}
+      },
+      "id": "normalize-suppliers",
+      "name": "Normalize Suppliers with 9Router",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.choices?.[0]?.message?.content ?? '';\nconst normalized = content.replace(/^```json\\s*/i, '').replace(/\\s*```$/i, '').trim();\nconst parsed = JSON.parse(normalized);\nreturn [{ json: { suppliers: Array.isArray(parsed) ? parsed : parsed.suppliers ?? [] } }];"
+      },
+      "id": "parse-suppliers",
+      "name": "Parse Suppliers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8080/api/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify({email: $env.AUTH_ADMIN_EMAIL, password: $env.AUTH_ADMIN_PASSWORD})}}",
+        "options": {}
+      },
+      "id": "login-crm",
+      "name": "Authenticate CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8080/api/solar-suppliers/import",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $json.token}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify({suppliers: $('Parse Suppliers').first().json.suppliers})}}",
+        "options": {}
+      },
+      "id": "import-suppliers",
+      "name": "Import Suppliers to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1980, 0]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{"node": "Get Tavily Key", "type": "main", "index": 0}]]
+    },
+    "Get Tavily Key": {
+      "main": [[{"node": "Tavily Search", "type": "main", "index": 0}]]
+    },
+    "Tavily Search": {
+      "main": [[{"node": "Tavily Results Available?", "type": "main", "index": 0}]]
+    },
+    "Tavily Results Available?": {
+      "main": [
+        [{"node": "Get 9Router Key", "type": "main", "index": 0}],
+        [{"node": "Get Brave Key", "type": "main", "index": 0}]
+      ]
+    },
+    "Get Brave Key": {
+      "main": [[{"node": "Brave Search Fallback", "type": "main", "index": 0}]]
+    },
+    "Brave Search Fallback": {
+      "main": [[{"node": "Get 9Router Key", "type": "main", "index": 0}]]
+    },
+    "Get 9Router Key": {
+      "main": [[{"node": "Get 9Router Models", "type": "main", "index": 0}]]
+    },
+    "Get 9Router Models": {
+      "main": [[{"node": "Prepare Supplier Prompt", "type": "main", "index": 0}]]
+    },
+    "Prepare Supplier Prompt": {
+      "main": [[{"node": "Normalize Suppliers with 9Router", "type": "main", "index": 0}]]
+    },
+    "Normalize Suppliers with 9Router": {
+      "main": [[{"node": "Parse Suppliers", "type": "main", "index": 0}]]
+    },
+    "Parse Suppliers": {
+      "main": [[{"node": "Authenticate CRM", "type": "main", "index": 0}]]
+    },
+    "Authenticate CRM": {
+      "main": [[{"node": "Import Suppliers to CRM", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

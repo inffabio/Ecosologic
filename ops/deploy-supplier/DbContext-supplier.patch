@@ -1,0 +1,74 @@
+--- /home/hannibal/ecosologic/backend/src/Ecosologic.Infrastructure/Persistence/EcosologicDbContext.cs
++++ /home/hannibal/ecosologic/backend/src/Ecosologic.Infrastructure/Persistence/EcosologicDbContext.cs
+@@ -18,6 +18,7 @@
+     public DbSet<TariffComponentRecord> TariffComponents => Set<TariffComponentRecord>();
+     public DbSet<GridCompensationRuleRecord> GridCompensationRules => Set<GridCompensationRuleRecord>();
+     public DbSet<AneelTariffImportRecord> AneelTariffImports => Set<AneelTariffImportRecord>();
++    public DbSet<SolarSupplierRecord> SolarSuppliers => Set<SolarSupplierRecord>();
+ 
+     protected override void OnModelCreating(ModelBuilder modelBuilder)
+@@ -184,6 +185,20 @@
+             entity.Property(import => import.AccessedAt).IsRequired();
+         });
+ 
++        modelBuilder.Entity<SolarSupplierRecord>(entity =>
++        {
++            entity.ToTable("solar_suppliers");
++            entity.HasKey(item => item.Id);
++            entity.Property(item => item.Name).HasMaxLength(254).IsRequired();
++            entity.Property(item => item.Website).HasMaxLength(512);
++            entity.Property(item => item.Contact).HasMaxLength(254);
++            entity.Property(item => item.ContactName).HasMaxLength(254);
++            entity.Property(item => item.Phone).HasMaxLength(40);
++            entity.Property(item => item.WhatsApp).HasMaxLength(40);
++            entity.Property(item => item.Source).HasMaxLength(64).IsRequired();
++            entity.Property(item => item.Status).HasMaxLength(32).IsRequired();
++            entity.HasIndex(item => item.Name).IsUnique();
++        });
++
+@@ -598,6 +613,45 @@
+     }
+ }
+ 
++public sealed class SolarSupplierRecord
++{
++    public Guid Id { get; private set; }
++    public string Name { get; private set; } = "";
++    public string? Website { get; private set; }
++    public string? Contact { get; private set; }
++    public string? ContactName { get; private set; }
++    public string? Phone { get; private set; }
++    public string? WhatsApp { get; private set; }
++    public string Source { get; private set; } = "Manual";
++    public string Status { get; private set; } = "Approved";
++
++    public static SolarSupplierRecord Create(Guid id, string name, string? website, string? contact, string source)
++    {
++        SolarValidation.RequireGuid(id, nameof(id), "Id é obrigatório.");
++        return new SolarSupplierRecord
++        {
++            Id = id,
++            Name = SolarValidation.RequireText(name, nameof(name), "Nome do fornecedor é obrigatório."),
++            Website = string.IsNullOrWhiteSpace(website) ? null : website.Trim(),
++            Contact = string.IsNullOrWhiteSpace(contact) ? null : contact.Trim(),
++            Source = SolarValidation.RequireText(source, nameof(source), "Fonte é obrigatória.")
++        };
++    }
++
++    public static SolarSupplierRecord Discover(Guid id, string name, string? website, string? contact, string source)
++    {
++        var supplier = Create(id, name, website, contact, source);
++        supplier.Status = "Pending";
++        return supplier;
++    }
++
++    public void Approve(string contactName, string phone, string whatsapp)
++    {
++        ContactName = SolarValidation.RequireText(contactName, nameof(contactName), "Nome do contato é obrigatório.");
++        Phone = SolarValidation.RequireText(phone, nameof(phone), "Telefone é obrigatório.");
++        WhatsApp = SolarValidation.RequireText(whatsapp, nameof(whatsapp), "WhatsApp é obrigatório.");
++        Status = "Approved";
++    }
++}
++
+ public sealed class ProposalRecord

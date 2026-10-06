@@ -1,0 +1,16 @@
+--- /home/hannibal/ecosologic/backend/src/Ecosologic.Api/Program.cs
++++ /home/hannibal/ecosologic/backend/src/Ecosologic.Api/Program.cs
+@@ -2,7 +2,6 @@
+ using Ecosologic.Api.Configuration;
+ using Ecosologic.Api.Media;
+ using Ecosologic.Api.Security;
+-using Ecosologic.Api.Suppliers;
+ using Ecosologic.Infrastructure.Crm;
+ using Ecosologic.Infrastructure.Email;
+ using Ecosologic.Infrastructure.Jobs;
+@@ -50,8 +49,6 @@
+ 
+ builder.Services.AddControllers();
+-builder.Services.Configure<SolarSupplierDiscoveryOptions>(builder.Configuration.GetSection("SolarSupplierDiscovery"));
+-builder.Services.AddHttpClient<SolarSupplierDiscovery>();
+ builder.Services.AddCors(options => options.AddPolicy("frontend", policy =>

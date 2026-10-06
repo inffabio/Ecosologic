@@ -1,0 +1,70 @@
+<section class="proposal-shell">
+  <aside>
+    <div class="proposal-brand"><img src="assets/brand/logo.png" alt="Ecosologic" /></div>
+    <p>Workspace</p>
+    <a href="/admin/crm">▦ <span>Visão geral</span></a
+    ><a href="/admin/dimensionamento">⌁ <span>Dimensionamentos</span></a
+    ><a class="active" href="/admin/propostas">▤ <span>Propostas</span></a>
+    <div class="proposal-user">
+      <b>FA</b><span>Fabio<br /><small>Administrador</small></span>
+    </div>
+  </aside>
+  <main>
+    <header>
+      <div>
+        <p class="crumb">Workspace / Propostas</p>
+        <h1>Emitir proposta</h1>
+      </div>
+      <span class="template">TEMPLATE {{ templateVersion }}</span>
+    </header>
+    <section class="proposal-intro">
+      <span class="seal">✦</span>
+      <div>
+        <span class="kicker">DOCUMENTO VERSIONADO</span>
+        <h2>Uma proposta clara começa no snapshot certo.</h2>
+        <p>
+          Gere o arquivo a partir da cotação aprovada. O PDF emitido permanece imutável até uma nova
+          geração explícita.
+        </p>
+      </div>
+    </section>
+    @if (error()) {
+      <p class="feedback" role="alert">{{ error() }}</p>
+    }
+    <div class="proposal-grid">
+      <form (submit)="$event.preventDefault(); generate()">
+        <label
+          >ID da cotação aprovada<input
+            name="quoteId"
+            [(ngModel)]="quoteId"
+            placeholder="UUID da cotação" /></label
+        ><label
+          >Versão do template<input name="templateVersion" [(ngModel)]="templateVersion" /></label
+        ><label>Título da proposta<input name="title" [(ngModel)]="title" /></label
+        ><button type="submit" [disabled]="loading()">
+          {{ loading() ? 'Gerando PDF...' : 'Gerar proposta' }} <span>↗</span>
+        </button>
+      </form>
+      @if (proposal(); as document) {
+        <section class="document-result">
+          <span class="document-icon">PDF</span>
+          <div>
+            <span class="kicker">GERADO COM SUCESSO</span>
+            <h3>{{ document.status }}</h3>
+            <p>Versão {{ document.templateVersion }} · hash SHA-256 verificado</p>
+            <code>{{ document.fileHash }}</code
+            ><a [href]="document.fileUrl" target="_blank" rel="noopener"
+              >Abrir PDF <span>↗</span></a
+            >
+          </div>
+        </section>
+      } @else {
+        <section class="document-empty">
+          <span>◫</span>
+          <h3>Nenhum documento emitido nesta sessão</h3>
+          <p>O arquivo só será criado depois que uma cotação aprovada for informada.</p>
+        </section>
+      }
+    </div>
+  </main>
+</section>

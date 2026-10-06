@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.Http.Headers;
 
 namespace Ecosologic.Api.Controllers;
 
@@ -31,8 +32,13 @@ public sealed class AuthController(IConfiguration configuration) : ControllerBas
                 title: "Autenticação não configurada.");
         }
 
+        var email = request.Email;
+        var password = request.Password;
+        if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(password))
+            (email, password) = ReadBasicCredentials();
+
         var validator = new AdminCredentialValidator(adminEmail, adminPassword);
-        if (!validator.Validate(request.Email, request.Password))
+        if (!validator.Validate(email, password))
             return Unauthorized(new { message = "Credenciais inválidas." });
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -45,6 +51,27 @@ public sealed class AuthController(IConfiguration configuration) : ControllerBas
             signingCredentials: credentials);
 
         return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+    }
+
+    private (string? Email, string? Password) ReadBasicCredentials()
+    {
+        if (!AuthenticationHeaderValue.TryParse(Request.Headers.Authorization, out var header)
+            || !string.Equals(header.Scheme, "Basic", StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrWhiteSpace(header.Parameter))
+            return (null, null);
+
+        try
+        {
+            var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(header.Parameter));
+            var separator = decoded.IndexOf(':');
+            return separator < 0
+                ? (null, null)
+                : (decoded[..separator], decoded[(separator + 1)..]);
+        }
+        catch (FormatException)
+        {
+            return (null, null);
+        }
     }
 }
 

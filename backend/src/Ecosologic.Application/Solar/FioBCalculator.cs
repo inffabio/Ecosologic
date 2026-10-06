@@ -17,6 +17,35 @@ public sealed class FioBCalculator
 {
     public const string EngineVersion = "1.0.0";
 
+    public static GridCompensationRule SelectRule(
+        FioBRuleSelectionRequest request,
+        IReadOnlyList<GridCompensationRule> rules)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(rules);
+
+        var matches = rules
+            .Where(rule =>
+                (request.DistributorId is { } distributorId
+                    ? rule.DistributorId == distributorId
+                    : rule.Distributor == request.Distributor)
+                && rule.Group == request.Group
+                && rule.Subgroup == request.Subgroup
+                && rule.Modality == request.Modality
+                && rule.Post == request.Post
+                && rule.ReferenceYear == request.ReferenceYear
+                && rule.ValidityStart <= request.ReferenceDate
+                && (rule.ValidityEnd is null || rule.ValidityEnd >= request.ReferenceDate))
+            .ToList();
+
+        if (matches.Count == 0)
+            throw new InvalidOperationException("Nenhuma regra Fio B vigente corresponde aos parâmetros informados.");
+        if (matches.Count > 1)
+            throw new InvalidOperationException("Múltiplas regras Fio B vigentes correspondem aos parâmetros informados.");
+
+        return matches[0];
+    }
+
     public FioBResult Calculate(FioBRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

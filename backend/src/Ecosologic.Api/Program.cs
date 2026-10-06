@@ -1,12 +1,15 @@
 using System.Text;
 using Ecosologic.Api.Configuration;
 using Ecosologic.Api.Media;
+using Ecosologic.Api.LeadEnrichment;
 using Ecosologic.Api.Security;
+using Ecosologic.Api.Suppliers;
 using Ecosologic.Infrastructure.Crm;
 using Ecosologic.Infrastructure.Email;
 using Ecosologic.Infrastructure.Jobs;
 using Ecosologic.Infrastructure.Persistence;
 using Ecosologic.Infrastructure.Solar;
+using Ecosologic.Infrastructure.Secrets;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -48,6 +51,10 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(DataProtectionKeys.Resolve(builder.Configuration)));
 
 builder.Services.AddControllers();
+builder.Services.Configure<SolarSupplierDiscoveryOptions>(builder.Configuration.GetSection("SolarSupplierDiscovery"));
+builder.Services.AddHttpClient<SolarSupplierDiscovery>();
+builder.Services.Configure<RegionalLeadEnrichmentOptions>(builder.Configuration.GetSection("RegionalLeadEnrichment"));
+builder.Services.AddHttpClient<IRegionalLeadEnrichmentClient, RegionalLeadEnrichmentClient>();
 builder.Services.AddCors(options => options.AddPolicy("frontend", policy =>
     policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()));
 var connectionString = ConnectionString.Resolve(builder.Configuration);
@@ -64,6 +71,7 @@ builder.Services.AddScoped<ICrmNotificationSync>(sp => sp.GetRequiredService<Crm
 builder.Services.AddScoped<TariffCatalog>();
 builder.Services.AddAneelTariffSource();
 builder.Services.AddAneelTariffImport();
+builder.Services.AddInternalSecrets(builder.Configuration);
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 builder.Services.AddSingleton<ILeadEmailSender, LeadEmailSender>();
 builder.Services.AddSingleton<ISmtpTransportFactory, MailKitSmtpTransportFactory>();

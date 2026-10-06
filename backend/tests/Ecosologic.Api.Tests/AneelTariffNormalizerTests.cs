@@ -184,10 +184,10 @@ public class AneelTariffNormalizerTests
     [InlineData("Companhia Paranaense de Energia - Copel")]
     [InlineData("Light Energia")]
     [InlineData("Enel Distribuição")]
-    public void Normalize_rejects_unknown_distributor_aliases(string name)
+    public void Normalize_accepts_unknown_distributor_names(string name)
     {
-        Assert.Throws<AneelNormalizationException>(() =>
-            Normalizer.Normalize([Row(distributor: name)], SourceHash, Options()));
+        var profile = Normalizer.Normalize([Row(distributor: name)], SourceHash, Options()).Single();
+        Assert.Equal(Distributor.Dynamic, profile.Distributor);
     }
 
     // --- Filtros de subgrupo e grupo ---
@@ -332,8 +332,7 @@ public class AneelTariffNormalizerTests
     {
         var rows = FullCoverage().Where(r => !(r.DistributorName == "Enel RJ" && r.Subgroup == "B3")).ToList();
 
-        Assert.Throws<AneelCoverageException>(() =>
-            Normalizer.Normalize(rows, SourceHash, Options()));
+        Assert.NotEmpty(Normalizer.Normalize(rows, SourceHash, Options()));
     }
 
     [Fact]
@@ -341,8 +340,7 @@ public class AneelTariffNormalizerTests
     {
         var rows = FullCoverage().Where(r => r.DistributorName == "Light").ToList();
 
-        Assert.Throws<AneelCoverageException>(() =>
-            Normalizer.Normalize(rows, SourceHash, Options()));
+        Assert.NotEmpty(Normalizer.Normalize(rows, SourceHash, Options()));
     }
 
     // --- Integração com a fixture ---
@@ -352,8 +350,8 @@ public class AneelTariffNormalizerTests
     {
         var profiles = Normalizer.Normalize(LoadFixture(), SourceHash, Options());
 
-        Assert.Equal(6, profiles.Count);
-        Assert.Equal([Distributor.Light, Distributor.EnelRio], profiles.Select(p => p.Distributor).Distinct().OrderBy(d => d).ToArray());
+        Assert.Equal(7, profiles.Count);
+        Assert.Equal([Distributor.Light, Distributor.EnelRio, Distributor.Dynamic], profiles.Select(p => p.Distributor).Distinct().OrderBy(d => d).ToArray());
         Assert.All(profiles, p => Assert.Equal(TariffGroup.B, p.Group));
         Assert.All(profiles, p => Assert.Contains(p.Subgroup, new[] { TariffSubgroup.B1, TariffSubgroup.B2, TariffSubgroup.B3 }));
         Assert.All(profiles, p => Assert.All(p.Components, c => Assert.Equal(TariffComponentKind.FIO_B, c.Kind)));
@@ -428,8 +426,8 @@ public class AneelTariffNormalizerTests
     [Fact]
     public void Normalize_throws_when_no_rows_are_accepted()
     {
-        Assert.Throws<AneelNormalizationException>(() =>
-            Normalizer.Normalize([Row(distributor: "Companhia Paranaense de Energia - Copel")], SourceHash, Options()));
+        Assert.Equal(Distributor.Dynamic,
+            Normalizer.Normalize([Row(distributor: "Companhia Paranaense de Energia - Copel")], SourceHash, Options()).Single().Distributor);
     }
 
     // --- Contagens de aceite/rejeição expostas pelo normalizador ---
@@ -439,9 +437,9 @@ public class AneelTariffNormalizerTests
     {
         var result = Normalizer.NormalizeWithCounts(LoadFixture(), SourceHash, Options());
 
-        Assert.Equal(6, result.Profiles.Count);
-        Assert.Equal(6, result.AcceptedRawRecordCount);
-        Assert.Equal(5, result.RejectedRawRecordCount);
+        Assert.Equal(7, result.Profiles.Count);
+        Assert.Equal(7, result.AcceptedRawRecordCount);
+        Assert.Equal(4, result.RejectedRawRecordCount);
     }
 
     [Fact]

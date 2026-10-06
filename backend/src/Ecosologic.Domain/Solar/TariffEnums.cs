@@ -3,7 +3,8 @@ namespace Ecosologic.Domain.Solar;
 public enum Distributor
 {
     Light = 1,
-    EnelRio = 2
+    EnelRio = 2,
+    Dynamic = 999
 }
 
 public enum TariffGroup

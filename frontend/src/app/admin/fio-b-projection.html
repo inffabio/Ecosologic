@@ -1,0 +1,31 @@
+<main class="projection-shell">
+  <a class="back" href="/admin/crm">← Voltar para visão geral</a>
+  <header><div><span class="eyebrow">PROJEÇÃO TARIFÁRIA</span><h1>Quanto vou pagar de Fio B?</h1><p>Estime o custo da energia compensada usando a regra vigente da distribuidora.</p></div><span class="sun">☼</span></header>
+
+  <nav class="tabs" aria-label="Modo de cálculo">
+    <button [class.active]="mode() === 'quick'" (click)="mode.set('quick')">Cálculo rápido</button>
+    <button [class.active]="mode() === 'complete'" (click)="mode.set('complete')">Cálculo completo</button>
+  </nav>
+
+  <section class="card form-card">
+    <div class="form-grid">
+      <label>Distribuidora<input [(ngModel)]="distributorQuery" (input)="searchDistributors()" placeholder="Digite o nome da concessionária" autocomplete="off" />@if (distributors().length) {<span class="suggestions">@for (item of distributors(); track item.id) {<button type="button" (click)="selectDistributor(item)">{{ item.officialName }}</button>}</span>}</label>
+      <label>Ano de referência<input type="number" [(ngModel)]="year" min="2024" max="2100" /></label>
+      @if (mode() === 'quick') {
+        <label>Consumo médio mensal (kWh)<input type="number" [(ngModel)]="consumption" (ngModelChange)="recalculate()" min="0" /><input class="range" type="range" [(ngModel)]="consumption" (ngModelChange)="recalculate()" min="0" max="3000" step="10" /></label>
+        <label>Geração média mensal (kWh)<input type="number" [(ngModel)]="generation" (ngModelChange)="recalculate()" min="0" /><input class="range" type="range" [(ngModel)]="generation" (ngModelChange)="recalculate()" min="0" max="3000" step="10" /></label>
+      }
+    </div>
+    @if (mode() === 'complete') {
+      <div class="monthly-grid"><div></div><strong>Consumo</strong><strong>Geração</strong>@for (month of months; track month; let i = $index) {<span>{{ month }}</span><input type="number" [(ngModel)]="monthlyConsumption[i]" (ngModelChange)="recalculate()" min="0" /><input type="number" [(ngModel)]="monthlyGeneration[i]" (ngModelChange)="recalculate()" min="0" />}</div>
+    }
+    <button class="primary" [disabled]="loading()" (click)="calculate()">{{ loading() ? 'Consultando regra...' : 'Calcular projeção' }} →</button>
+    @if (error()) { <p class="error">{{ error() }}</p> }
+  </section>
+
+  @if (result(); as data) {
+    <section class="summary-grid"><article><span>Fio B aplicado</span><strong>{{ data.percent | number:'1.0-2' }}%</strong></article><article><span>Tarifa-base</span><strong>{{ data.base | currency:'BRL' }}/kWh</strong></article><article><span>Energia compensada</span><strong>{{ data.annualCompensated | number:'1.0-0' }} kWh/ano</strong></article><article class="highlight"><span>Projeção anual</span><strong>{{ data.annualCost | currency:'BRL' }}</strong><small>{{ data.annualCost / 12 | currency:'BRL' }}/mês em média</small></article></section>
+    <section class="charts"><article class="card chart-card"><div class="section-heading"><div><span class="eyebrow">ENERGIA COMPENSADA</span><h2>Projeção mensal</h2></div></div><div class="bars">@for (row of data.rows; track row.label) {<div class="bar-column"><span>{{ row.compensated | number:'1.0-0' }}</span><div class="bar energy" [style.height.%]="barHeight(row.compensated, data.rows, 'compensated')"></div><small>{{ row.label }}</small></div>}</div></article><article class="card chart-card"><div class="section-heading"><div><span class="eyebrow">CUSTO ESTIMADO</span><h2>Fio B por mês</h2></div></div><div class="bars">@for (row of data.rows; track row.label) {<div class="bar-column"><span>{{ row.cost | currency:'BRL':'symbol':'1.0-0' }}</span><div class="bar cost" [style.height.%]="barHeight(row.cost, data.rows, 'cost')"></div><small>{{ row.label }}</small></div>}</div></article></section>
+    <section class="card table-card"><div class="section-heading"><div><span class="eyebrow">MEMÓRIA DE CÁLCULO</span><h2>Energia compensada por mês</h2></div><span class="badge">{{ distributor === 'Light' ? 'Light' : 'Enel RJ' }} · {{ year }}</span></div><div class="table-wrap"><table><thead><tr><th>Mês</th><th>Consumo</th><th>Geração</th><th>Injetada</th><th>Compensada</th><th>Fio B</th></tr></thead><tbody>@for (row of data.rows; track row.label) {<tr><td>{{ row.label }}</td><td>{{ row.consumption | number:'1.0-0' }}</td><td>{{ row.generation | number:'1.0-0' }}</td><td>{{ row.injected | number:'1.0-0' }} kWh</td><td>{{ row.compensated | number:'1.0-0' }} kWh</td><td>{{ row.cost | currency:'BRL' }}</td></tr>}</tbody></table></div><p class="note">A projeção considera energia compensada igual ao menor valor entre consumo e geração. A fatura real pode variar com simultaneidade, créditos acumulados e regras do ciclo de faturamento.</p><a class="source" [href]="data.source" target="_blank" rel="noreferrer">{{ data.resolution }} · consultar fonte regulatória ↗</a></section>
+  }
+</main>

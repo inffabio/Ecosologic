@@ -121,6 +121,7 @@ public sealed class SolarSizingCalculator
         var (modulesPerString, stringCount) = CompleteConfiguration(input, moduleCount);
 
         var alerts = BuildAlerts(input, moduleCount, modulesPerString, stringCount, installedKwp, totalLosses, annualGeneration);
+        var charts = BuildCharts(input, generation);
 
         return SolarSizingResult.Create(
             Array.AsReadOnly(generation),
@@ -143,7 +144,56 @@ public sealed class SolarSizingCalculator
             generation[worstMonthIndex],
             consumption[worstMonthIndex],
             worstDeficit,
-            alerts.AsReadOnly());
+            alerts.AsReadOnly(),
+            charts,
+            Array.AsReadOnly(consumption.ToArray()));
+    }
+
+    private static SolarSizingCharts BuildCharts(SolarSizingInput input, IReadOnlyList<double> generation)
+    {
+        var labels = new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" };
+        var generationSeries = new SolarChartSeries(
+            "generation",
+            "kWh",
+            labels.Select((label, index) => new SolarChartPoint(label, generation[index], "kWh")).ToArray());
+        var consumptionSeries = new SolarChartSeries(
+            "consumption",
+            "kWh",
+            labels.Select((label, index) => new SolarChartPoint(label, input.MonthlyConsumptionKWh[index], "kWh")).ToArray());
+
+        if (input.MonthlyBillAmount is null)
+            return new SolarSizingCharts([generationSeries, consumptionSeries], [], []);
+
+        var withoutSolar = new SolarChartSeries(
+            "withoutSolar",
+            "R$",
+            labels.Select((label, index) => new SolarChartPoint(label, (double)input.MonthlyBillAmount[index], "R$")).ToArray());
+        var withSolar = new SolarChartSeries(
+            "withSolar",
+            "R$",
+            labels.Select((label, index) => new SolarChartPoint(label, (double)input.MonthlyBillWithSolarAmount![index], "R$")).ToArray());
+        var savings = new SolarChartSeries(
+            "savings",
+            "R$",
+            labels.Select((label, index) => new SolarChartPoint(
+                label,
+                (double)(input.MonthlyBillAmount[index] - input.MonthlyBillWithSolarAmount![index]),
+                "R$")).ToArray());
+
+        var cumulative = 0m;
+        var cashFlow = new SolarChartSeries(
+            "cumulativeCashFlow",
+            "R$",
+            labels.Select((label, index) =>
+            {
+                cumulative += input.MonthlyBillAmount[index] - input.MonthlyBillWithSolarAmount![index];
+                return new SolarChartPoint(label, (double)(cumulative - (input.InvestmentAmount ?? 0m)), "R$");
+            }).ToArray());
+
+        return new SolarSizingCharts(
+            [generationSeries, consumptionSeries],
+            [cashFlow],
+            [withoutSolar, withSolar, savings]);
     }
 
     private static (int ModulesPerString, int StringCount) CompleteConfiguration(

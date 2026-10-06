@@ -16,7 +16,9 @@ public sealed class SolarSizing
         string grupo,
         string modalidade,
         string engineVersion,
-        string inputsJson)
+        string inputsJson,
+        string materialSnapshotJson,
+        string tariffSnapshotJson)
     {
         Id = Guid.NewGuid();
         LeadId = leadId;
@@ -25,6 +27,8 @@ public sealed class SolarSizing
         Modalidade = modalidade;
         EngineVersion = engineVersion;
         InputsJson = inputsJson;
+        MaterialSnapshotJson = materialSnapshotJson;
+        TariffSnapshotJson = tariffSnapshotJson;
         Status = SolarSizingStatus.Draft;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
@@ -37,6 +41,8 @@ public sealed class SolarSizing
     public string Modalidade { get; }
     public string EngineVersion { get; }
     public string InputsJson { get; }
+    public string MaterialSnapshotJson { get; }
+    public string TariffSnapshotJson { get; }
     public string? ResultsJson { get; private set; }
     public SolarSizingStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; }
@@ -48,7 +54,9 @@ public sealed class SolarSizing
         string grupo,
         string modalidade,
         string engineVersion,
-        string inputsJson)
+        string inputsJson,
+        string materialSnapshotJson = "{}",
+        string tariffSnapshotJson = "{}")
     {
         SolarValidation.RequireGuid(leadId, nameof(leadId), "LeadId é obrigatório.");
         concessionaria = SolarValidation.RequireText(concessionaria, nameof(concessionaria), "Concessionária é obrigatória.");
@@ -56,8 +64,10 @@ public sealed class SolarSizing
         modalidade = SolarValidation.RequireText(modalidade, nameof(modalidade), "Modalidade é obrigatória.");
         engineVersion = SolarValidation.RequireText(engineVersion, nameof(engineVersion), "Versão do motor é obrigatória.");
         inputsJson = SolarValidation.RequireJson(inputsJson, nameof(inputsJson), "Snapshot de entradas é obrigatório.");
+        materialSnapshotJson = SolarValidation.RequireJson(materialSnapshotJson, nameof(materialSnapshotJson), "Snapshot de materiais é obrigatório.");
+        tariffSnapshotJson = SolarValidation.RequireJson(tariffSnapshotJson, nameof(tariffSnapshotJson), "Snapshot tarifário é obrigatório.");
 
-        return new SolarSizing(leadId, concessionaria, grupo, modalidade, engineVersion, inputsJson);
+        return new SolarSizing(leadId, concessionaria, grupo, modalidade, engineVersion, inputsJson, materialSnapshotJson, tariffSnapshotJson);
     }
 
     public void Calculate(string resultsJson)

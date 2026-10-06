@@ -10,6 +10,7 @@
     <PackageReference Include="MailKit" Version="4.18.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.12" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.12" />
+    <PackageReference Include="OCI.DotNetSDK.Secrets" Version="147.1.0" />
   </ItemGroup>
 
   <ItemGroup>

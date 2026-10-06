@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace Ecosologic.Api.Tests;
 
@@ -88,5 +91,23 @@ public sealed class AuthControllerTests
         var result = controller.Login(new LoginRequest("outro@ecosologic.com.br", Password));
 
         Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public void Login_accepts_basic_auth_when_body_is_empty()
+    {
+        var controller = new AuthController(Config())
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            }
+        };
+        controller.Request.Headers.Authorization =
+            new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Email}:{Password}"))).ToString();
+
+        var result = controller.Login(new LoginRequest(null, null));
+
+        Assert.IsType<OkObjectResult>(result);
     }
 }

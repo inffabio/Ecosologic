@@ -18,7 +18,10 @@ public sealed class SolarSizingInput
         double deratingFactor,
         SolarInverterSpec? inverter,
         int? modulesPerString,
-        int? stringCount)
+        int? stringCount,
+        IReadOnlyList<decimal>? monthlyBillAmount,
+        IReadOnlyList<decimal>? monthlyBillWithSolarAmount,
+        decimal? investmentAmount)
     {
         MonthlyConsumptionKWh = monthlyConsumptionKWh;
         MonthlyHsp = monthlyHsp;
@@ -33,6 +36,9 @@ public sealed class SolarSizingInput
         Inverter = inverter;
         ModulesPerString = modulesPerString;
         StringCount = stringCount;
+        MonthlyBillAmount = monthlyBillAmount;
+        MonthlyBillWithSolarAmount = monthlyBillWithSolarAmount;
+        InvestmentAmount = investmentAmount;
     }
 
     public IReadOnlyList<double> MonthlyConsumptionKWh { get; }
@@ -48,6 +54,9 @@ public sealed class SolarSizingInput
     public SolarInverterSpec? Inverter { get; }
     public int? ModulesPerString { get; }
     public int? StringCount { get; }
+    public IReadOnlyList<decimal>? MonthlyBillAmount { get; }
+    public IReadOnlyList<decimal>? MonthlyBillWithSolarAmount { get; }
+    public decimal? InvestmentAmount { get; }
 
     public static SolarSizingInput Create(
         IReadOnlyList<double> monthlyConsumptionKWh,
@@ -62,7 +71,10 @@ public sealed class SolarSizingInput
         double? deratingFactor = null,
         SolarInverterSpec? inverter = null,
         int? modulesPerString = null,
-        int? stringCount = null)
+        int? stringCount = null,
+        IReadOnlyList<decimal>? monthlyBillAmount = null,
+        IReadOnlyList<decimal>? monthlyBillWithSolarAmount = null,
+        decimal? investmentAmount = null)
     {
         var consumption = SolarSizingValidation.RequireMonthlySeries(monthlyConsumptionKWh, nameof(monthlyConsumptionKWh));
         var hsp = SolarSizingValidation.RequireMonthlySeries(monthlyHsp, nameof(monthlyHsp));
@@ -92,6 +104,18 @@ public sealed class SolarSizingInput
         if (stringCount is <= 0)
             throw new ArgumentOutOfRangeException(nameof(stringCount), "Número de strings deve ser no mínimo 1.");
 
+        if ((monthlyBillAmount is null) != (monthlyBillWithSolarAmount is null))
+            throw new ArgumentException("As séries de fatura sem e com solar devem ser informadas juntas.");
+
+        if (monthlyBillAmount is not null)
+        {
+            RequireMonthlyMoney(monthlyBillAmount, nameof(monthlyBillAmount));
+            RequireMonthlyMoney(monthlyBillWithSolarAmount!, nameof(monthlyBillWithSolarAmount));
+        }
+
+        if (investmentAmount is < 0)
+            throw new ArgumentOutOfRangeException(nameof(investmentAmount), "Investimento não pode ser negativo.");
+
         return new SolarSizingInput(
             consumption,
             hsp,
@@ -105,6 +129,17 @@ public sealed class SolarSizingInput
             derating,
             inverter,
             modulesPerString,
-            stringCount);
+            stringCount,
+            monthlyBillAmount,
+            monthlyBillWithSolarAmount,
+            investmentAmount);
+    }
+
+    private static void RequireMonthlyMoney(IReadOnlyList<decimal> values, string name)
+    {
+        if (values.Count != 12)
+            throw new ArgumentException($"{name} deve conter exatamente 12 valores.", name);
+        if (values.Any(value => value < 0 || decimal.Round(value, 2) != value))
+            throw new ArgumentOutOfRangeException(name, "Valores de fatura devem ser não negativos e ter no máximo 2 casas decimais.");
     }
 }

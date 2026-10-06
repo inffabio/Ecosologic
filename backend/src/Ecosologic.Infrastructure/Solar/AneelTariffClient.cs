@@ -330,7 +330,6 @@ public sealed class AneelTariffClient(HttpClient httpClient) : IAneelTariffSourc
 
         var where = new JsonArray
         {
-            InCondition(source, DistributorColumn, ReportLabels),
             InCondition(source, GroupColumn, ["B"]),
             InCondition(source, SubgroupColumn, ApprovedSubgroups),
             InCondition(source, ComponentColumn, [TargetComponent]),

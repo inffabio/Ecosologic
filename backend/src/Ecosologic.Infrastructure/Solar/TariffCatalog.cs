@@ -29,7 +29,8 @@ public sealed record TariffProfileFilter(
     TariffModality? Modality = null,
     TariffPost? Post = null,
     DateOnly? AsOfDate = null,
-    bool? IsComplete = null);
+    bool? IsComplete = null,
+    Guid? DistributorId = null);
 
 public sealed record GridCompensationRuleFilter(
     Distributor? Distributor = null,
@@ -39,7 +40,8 @@ public sealed record GridCompensationRuleFilter(
     TariffPost? Post = null,
     int? ReferenceYear = null,
     DateOnly? AsOfDate = null,
-    bool? IsComplete = null);
+    bool? IsComplete = null,
+    Guid? DistributorId = null);
 
 public sealed record GridCompensationRuleLookupResult(TariffLookupStatus Status, GridCompensationRuleRecord? Rule)
 {
@@ -98,10 +100,15 @@ public sealed class TariffCatalog(EcosologicDbContext db)
         TariffProfileFilter filter,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<TariffProfileRecord> query = db.TariffProfiles.AsNoTracking().Include(profile => profile.Components);
+        IQueryable<TariffProfileRecord> query = db.TariffProfiles.AsNoTracking()
+            .Include(profile => profile.Components)
+            .Include(profile => profile.DistributorRecord);
 
         if (filter.Distributor.HasValue)
             query = query.Where(profile => profile.Distributor == filter.Distributor.Value);
+
+        if (filter.DistributorId.HasValue)
+            query = query.Where(profile => profile.DistributorId == filter.DistributorId.Value);
 
         if (filter.Group.HasValue)
             query = query.Where(profile => profile.Group == filter.Group.Value);
@@ -256,6 +263,23 @@ public sealed class TariffCatalog(EcosologicDbContext db)
         var inserted = 0;
         var closed = 0;
         var unchanged = 0;
+        var distributorIds = await db.Distributors
+            .Select(distributor => distributor.Id)
+            .ToHashSetAsync(cancellationToken);
+
+        foreach (var profile in profiles.Where(profile => profile.DistributorId is not null)
+                     .GroupBy(profile => profile.DistributorId!.Value)
+                     .Select(group => group.First()))
+        {
+            if (distributorIds.Contains(profile.DistributorId!.Value))
+                continue;
+
+            db.Distributors.Add(DistributorRecord.Create(
+                profile.DistributorId.Value,
+                profile.SourceDistributorName,
+                profile.SourceDistributorName));
+            distributorIds.Add(profile.DistributorId.Value);
+        }
 
         foreach (var group in profiles.GroupBy(profile =>
                      (profile.Distributor, profile.Group, profile.Subgroup, profile.Modality)))
@@ -314,7 +338,11 @@ public sealed class TariffCatalog(EcosologicDbContext db)
                     .DefaultIfEmpty(0)
                     .Max() + 1;
 
-                var record = ToRecord(profile, version, isCurrent: true);
+                var record = ToRecord(
+                    profile,
+                    version,
+                    isCurrent: true,
+                    distributorId: profile.DistributorId is { } id && distributorIds.Contains(id) ? id : null);
                 db.TariffProfiles.Add(record);
                 existing.Add(record);
                 current.Add(record);
@@ -390,7 +418,7 @@ public sealed class TariffCatalog(EcosologicDbContext db)
         }
     }
 
-    private static TariffProfileRecord ToRecord(AneelNormalizedProfile profile, int version, bool isCurrent)
+    private static TariffProfileRecord ToRecord(AneelNormalizedProfile profile, int version, bool isCurrent, Guid? distributorId = null)
     {
         var components = profile.Components
             .Select(component => TariffComponent.Create(
@@ -417,17 +445,22 @@ public sealed class TariffCatalog(EcosologicDbContext db)
             profile.IsComplete,
             components,
             version,
-            isCurrent);
+            isCurrent,
+            distributorId);
     }
 
     public async Task<IReadOnlyList<GridCompensationRuleRecord>> ListGridCompensationRulesAsync(
         GridCompensationRuleFilter filter,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<GridCompensationRuleRecord> query = db.GridCompensationRules.AsNoTracking();
+        IQueryable<GridCompensationRuleRecord> query = db.GridCompensationRules.AsNoTracking()
+            .Include(rule => rule.DistributorRecord);
 
         if (filter.Distributor.HasValue)
             query = query.Where(rule => rule.Distributor == filter.Distributor.Value);
+
+        if (filter.DistributorId.HasValue)
+            query = query.Where(rule => rule.DistributorId == filter.DistributorId.Value);
 
         if (filter.Group.HasValue)
             query = query.Where(rule => rule.Group == filter.Group.Value);
@@ -469,9 +502,10 @@ public sealed class TariffCatalog(EcosologicDbContext db)
         TariffPost post,
         int referenceYear,
         DateOnly date,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Guid? distributorId = null)
     {
-        var matches = await db.GridCompensationRules.AsNoTracking()
+        IQueryable<GridCompensationRuleRecord> query = db.GridCompensationRules.AsNoTracking()
             .Where(rule =>
                 rule.Distributor == distributor
                 && rule.Group == group
@@ -480,9 +514,12 @@ public sealed class TariffCatalog(EcosologicDbContext db)
                 && rule.Post == post
                 && rule.ReferenceYear == referenceYear
                 && rule.ValidityStart <= date
-                && (rule.ValidityEnd == null || rule.ValidityEnd >= date))
-            .Take(2)
-            .ToListAsync(cancellationToken);
+                && (rule.ValidityEnd == null || rule.ValidityEnd >= date));
+
+        if (distributorId.HasValue)
+            query = query.Where(rule => rule.DistributorId == distributorId.Value);
+
+        var matches = await query.Take(2).ToListAsync(cancellationToken);
 
         if (matches.Count == 0)
             return GridCompensationRuleLookupResult.Missing();
@@ -515,6 +552,7 @@ public sealed class TariffCatalog(EcosologicDbContext db)
         {
             var overlaps = await db.GridCompensationRules.AsNoTracking().AnyAsync(existing =>
                 existing.Distributor == rule.Distributor
+                && existing.DistributorId == rule.DistributorId
                 && existing.Group == rule.Group
                 && existing.Subgroup == rule.Subgroup
                 && existing.Modality == rule.Modality

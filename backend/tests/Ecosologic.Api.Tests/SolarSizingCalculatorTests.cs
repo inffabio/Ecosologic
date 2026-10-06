@@ -104,6 +104,41 @@ public class SolarSizingCalculatorTests
         Assert.Equal(result.AnnualConsumptionKWh, result.AnnualEnergyCompensableKWh + result.DeficitKWh, 6);
     }
 
+    [Fact]
+    public void Reference_case_exposes_generation_and_consumption_chart_series()
+    {
+        var result = Calculator.Calculate(ReferenceInput());
+
+        Assert.Equal(2, result.Charts.GenerationVsConsumption.Count);
+        Assert.Equal(12, result.Charts.GenerationVsConsumption[0].Points.Count);
+        Assert.Equal("kWh", result.Charts.GenerationVsConsumption[0].Unit);
+        Assert.Equal("Jan", result.Charts.GenerationVsConsumption[0].Points[0].Label);
+        Assert.Equal(result.MonthlyGenerationKWh[0], result.Charts.GenerationVsConsumption[0].Points[0].Value, 10);
+        Assert.Equal(result.MonthlyConsumptionKWh[0], result.Charts.GenerationVsConsumption[1].Points[0].Value, 10);
+    }
+
+    [Fact]
+    public void Financial_chart_series_use_backend_values_when_financial_inputs_are_present()
+    {
+        var result = Calculator.Calculate(SolarSizingInput.Create(
+            RefConsumption,
+            RefHsp,
+            RefK,
+            RefModule(),
+            RefLosses,
+            "Norte",
+            10,
+            50,
+            monthlyBillAmount: Enumerable.Repeat(600m, 12).ToArray(),
+            monthlyBillWithSolarAmount: Enumerable.Repeat(180m, 12).ToArray(),
+            investmentAmount: 24000m));
+
+        Assert.Equal(3, result.Charts.AnnualBillComparison.Count);
+        Assert.Equal(12, result.Charts.FinancialCashFlow[0].Points.Count);
+        Assert.Equal(-23580m, (decimal)result.Charts.FinancialCashFlow[0].Points[0].Value, 2);
+        Assert.Equal("R$", result.Charts.AnnualBillComparison[0].Unit);
+    }
+
     // --- Perdas ---
 
     [Fact]

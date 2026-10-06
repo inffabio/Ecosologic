@@ -1,0 +1,261 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f4f5f2;
+  color: #152431;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.quote-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+aside {
+  background: #10202c;
+  color: #fff;
+  padding: 1.6rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.quote-brand img {
+  width: 125px;
+  filter: brightness(0) invert(1);
+  margin: 0.4rem 0.6rem 3rem;
+}
+aside p {
+  color: #70808a;
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin: 0.3rem 0.7rem 0.7rem;
+}
+aside a {
+  color: #aebbc0;
+  text-decoration: none;
+  padding: 0.78rem 0.7rem;
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.82rem;
+}
+aside a:first-letter {
+  color: #f5c84c;
+}
+aside a.active,
+aside a:hover {
+  background: #1d3540;
+  color: #fff;
+}
+.quote-user {
+  border-top: 1px solid #2a3d46;
+  margin-top: auto;
+  padding: 1.2rem 0.3rem 0.2rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.75rem;
+}
+.quote-user b {
+  background: #f5c84c;
+  color: #10202c;
+  padding: 0.55rem;
+  font-size: 0.65rem;
+}
+.quote-user small {
+  color: #809098;
+}
+main {
+  max-width: 1250px;
+  width: 100%;
+  margin: auto;
+  padding: 2.3rem clamp(1.1rem, 5vw, 5rem);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+header p {
+  font-size: 0.7rem;
+  color: #738189;
+  margin: 0 0 0.4rem;
+}
+h1 {
+  font: 600 clamp(1.8rem, 3vw, 2.5rem) 'Manrope';
+  letter-spacing: -0.06em;
+  margin: 0;
+}
+.quote-state {
+  color: #53715f;
+  border: 1px solid #bed0c0;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+.quote-intro {
+  margin-top: 2rem;
+  background: #dce8dc;
+  padding: 1.7rem 2rem;
+  display: flex;
+  gap: 1.3rem;
+}
+.quote-intro > span {
+  font-size: 2.5rem;
+  color: #53715f;
+}
+.quote-intro small {
+  color: #53715f;
+  letter-spacing: 0.13em;
+  font-size: 0.62rem;
+}
+.quote-intro h2 {
+  font: 600 clamp(1.4rem, 2.4vw, 2.1rem) 'Manrope';
+  letter-spacing: -0.06em;
+  margin: 0.4rem 0;
+}
+.quote-intro p {
+  color: #53715f;
+  margin: 0;
+}
+.feedback {
+  background: #f7dddd;
+  color: #8d3030;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+}
+.quote-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.75fr) minmax(320px, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+form {
+  background: #fff;
+  padding: 1.4rem;
+  display: grid;
+  gap: 1rem;
+}
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: #53616a;
+  font-size: 0.72rem;
+}
+input,
+select {
+  border: 1px solid #cad3ce;
+  background: #fff;
+  padding: 0.75rem;
+  font: inherit;
+  outline: 0;
+}
+input:focus,
+select:focus {
+  border-color: #53715f;
+  box-shadow: 0 0 0 3px #dce8dc;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+button {
+  border: 0;
+  background: #142d39;
+  color: #fff;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+}
+button b {
+  float: right;
+}
+button:disabled {
+  opacity: 0.55;
+}
+.quote-result {
+  background: #142d39;
+  color: #fff;
+  padding: 1.6rem;
+}
+.quote-result > small {
+  color: #f5c84c;
+  letter-spacing: 0.12em;
+  font-size: 0.62rem;
+}
+.quote-result h2 {
+  color: #f5c84c;
+  font: 600 clamp(2rem, 4vw, 3.3rem) 'Manrope';
+  letter-spacing: -0.07em;
+  margin: 1rem 0 0.2rem;
+}
+.quote-result p {
+  color: #c3d1cf;
+}
+.quote-actions {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+.quote-actions button {
+  background: #f5c84c;
+  color: #142d39;
+  padding: 0.7rem;
+  font-size: 0.75rem;
+}
+.quote-actions a {
+  color: #fff;
+  border-bottom: 1px solid #fff;
+  padding-bottom: 0.25rem;
+  text-decoration: none;
+  font-size: 0.78rem;
+}
+.quote-result pre {
+  font-size: 0.62rem;
+  color: #9cb0b3;
+  white-space: pre-wrap;
+  margin-top: 2rem;
+}
+.quote-empty {
+  border: 1px dashed #aebbb0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: #738189;
+  min-height: 290px;
+}
+.quote-empty span {
+  font-size: 3rem;
+  color: #53715f;
+}
+.quote-empty h3 {
+  color: #152431;
+  font: 600 1.1rem 'Manrope';
+}
+@media (max-width: 800px) {
+  .quote-shell {
+    grid-template-columns: 1fr;
+  }
+  aside {
+    display: none;
+  }
+  .quote-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  main {
+    padding: 1.2rem;
+  }
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+  header {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+}

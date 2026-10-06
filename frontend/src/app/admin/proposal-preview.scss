@@ -1,0 +1,267 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f4f5f2;
+  color: #152431;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.proposal-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+aside {
+  background: #10202c;
+  color: #fff;
+  padding: 1.6rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.proposal-brand img {
+  width: 125px;
+  filter: brightness(0) invert(1);
+  margin: 0.4rem 0.6rem 3rem;
+}
+aside p {
+  color: #70808a;
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin: 0.3rem 0.7rem 0.7rem;
+}
+aside a {
+  color: #aebbc0;
+  text-decoration: none;
+  padding: 0.78rem 0.7rem;
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.82rem;
+}
+aside a:first-letter {
+  color: #f5c84c;
+}
+aside a.active,
+aside a:hover {
+  background: #1d3540;
+  color: #fff;
+}
+.proposal-user {
+  border-top: 1px solid #2a3d46;
+  margin-top: auto;
+  padding: 1.2rem 0.3rem 0.2rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.75rem;
+}
+.proposal-user b {
+  background: #f5c84c;
+  color: #10202c;
+  padding: 0.55rem;
+  font-size: 0.65rem;
+}
+.proposal-user small {
+  color: #809098;
+}
+main {
+  max-width: 1250px;
+  width: 100%;
+  margin: auto;
+  padding: 2.3rem clamp(1.1rem, 5vw, 5rem);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+.crumb {
+  font-size: 0.7rem;
+  color: #738189;
+  margin: 0 0 0.4rem;
+}
+h1 {
+  font: 600 clamp(1.8rem, 3vw, 2.5rem) 'Manrope';
+  letter-spacing: -0.06em;
+  margin: 0;
+}
+.template {
+  font-size: 0.62rem;
+  color: #53715f;
+  border: 1px solid #bed0c0;
+  padding: 0.45rem 0.6rem;
+  letter-spacing: 0.08em;
+}
+.proposal-intro {
+  margin-top: 2rem;
+  background: #142d39;
+  color: #fff;
+  padding: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+.seal {
+  color: #f5c84c;
+  font-size: 3.5rem;
+}
+.kicker {
+  color: #f5c84c;
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+}
+.proposal-intro h2 {
+  font: 600 clamp(1.4rem, 2.5vw, 2.2rem) 'Manrope';
+  letter-spacing: -0.06em;
+  max-width: 24ch;
+  margin: 0.5rem 0;
+}
+.proposal-intro p {
+  color: #c3d1cf;
+  max-width: 55ch;
+  margin: 0;
+}
+.feedback {
+  background: #f7dddd;
+  color: #8d3030;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+}
+.proposal-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(320px, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+form {
+  background: #fff;
+  padding: 1.4rem;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: #53616a;
+  font-size: 0.72rem;
+}
+input {
+  border: 1px solid #cad3ce;
+  padding: 0.75rem;
+  font: inherit;
+  outline: 0;
+}
+input:focus {
+  border-color: #53715f;
+  box-shadow: 0 0 0 3px #dce8dc;
+}
+button {
+  background: #142d39;
+  border: 0;
+  color: #fff;
+  text-align: left;
+  padding: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+button span {
+  float: right;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.document-empty,
+.document-result {
+  min-height: 280px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.document-empty {
+  border: 1px dashed #aebbb0;
+  color: #738189;
+  text-align: center;
+}
+.document-empty > span {
+  font-size: 2.4rem;
+  color: #53715f;
+}
+.document-empty h3 {
+  font: 600 1.1rem 'Manrope';
+  color: #152431;
+}
+.document-empty p {
+  max-width: 30ch;
+  align-self: center;
+  font-size: 0.82rem;
+}
+.document-result {
+  background: #dce8dc;
+  flex-direction: row;
+  gap: 1.3rem;
+  align-items: center;
+}
+.document-icon {
+  background: #c64e4e;
+  color: #fff;
+  padding: 0.8rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.document-result h3 {
+  font: 600 1.5rem 'Manrope';
+  margin: 0.5rem 0;
+}
+.document-result p {
+  color: #53715f;
+  font-size: 0.8rem;
+}
+.document-result code {
+  display: block;
+  color: #53715f;
+  font-size: 0.62rem;
+  word-break: break-all;
+  margin: 1rem 0;
+}
+.document-result a {
+  display: inline-block;
+  color: #152431;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border-bottom: 1px solid #152431;
+  padding-bottom: 0.2rem;
+}
+@media (max-width: 800px) {
+  .proposal-shell {
+    grid-template-columns: 1fr;
+  }
+  aside {
+    display: none;
+  }
+  .proposal-grid {
+    grid-template-columns: 1fr;
+  }
+  .proposal-intro {
+    align-items: start;
+    padding: 1.3rem;
+  }
+  .seal {
+    font-size: 2.5rem;
+  }
+}
+@media (max-width: 520px) {
+  main {
+    padding: 1.2rem;
+  }
+  header {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .document-result {
+    padding: 1.3rem;
+  }
+}

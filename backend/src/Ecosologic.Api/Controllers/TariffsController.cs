@@ -3,14 +3,46 @@ using Ecosologic.Infrastructure.Persistence;
 using Ecosologic.Infrastructure.Solar;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecosologic.Api.Controllers;
 
 [ApiController]
 [Route("api/tariffs")]
 [Authorize(Roles = "Admin")]
-public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
+public sealed class TariffsController(TariffCatalog catalog, EcosologicDbContext? db = null) : ControllerBase
 {
+    [HttpGet("distributors")]
+    public async Task<IActionResult> ListDistributors(string? q, CancellationToken cancellationToken)
+    {
+        if (db is null)
+            return Problem("O contexto de persistência não está configurado.");
+
+        var query = db.Distributors.AsNoTracking().Where(distributor => distributor.IsActive);
+        IOrderedQueryable<DistributorRecord>? rankedQuery = null;
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            q = q.Trim();
+            query = query.Where(distributor =>
+                distributor.SearchVector.Matches(EF.Functions.WebSearchToTsQuery("simple", q)) ||
+                EF.Functions.ILike(distributor.OfficialName, $"%{q}%") ||
+                EF.Functions.ILike(distributor.AneelId, $"%{q}%"));
+            rankedQuery = query.OrderByDescending(distributor => EF.Functions.TrigramsSimilarity(distributor.OfficialName, q));
+        }
+
+        var distributors = await (rankedQuery ?? query.OrderBy(distributor => distributor.OfficialName))
+            .Select(distributor => new DistributorResponse(
+                distributor.Id,
+                distributor.AneelId,
+                distributor.OfficialName,
+                distributor.Cnpj,
+                distributor.LastSyncedAt))
+            .Take(10)
+            .ToListAsync(cancellationToken);
+
+        return Ok(distributors);
+    }
+
     [HttpGet("profiles")]
     public async Task<IActionResult> List(
         string? distributor,
@@ -20,7 +52,8 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
         string? post,
         DateOnly? date,
         bool? isComplete,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Guid? distributorId = null)
     {
         var parseOk = TryParse<Distributor>(distributor, out var parsedDistributor, out var distributorError);
         parseOk &= TryParse<TariffGroup>(group, out var parsedGroup, out var groupError);
@@ -46,7 +79,8 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
             parsedModality,
             parsedPost,
             date,
-            isComplete);
+            isComplete,
+            distributorId);
 
         var profiles = await catalog.ListAsync(filter, cancellationToken);
         return Ok(profiles.Select(ToResponse).ToList());
@@ -69,7 +103,8 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
         int? referenceYear,
         DateOnly? date,
         bool? isComplete,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Guid? distributorId = null)
     {
         var parseOk = TryParse<Distributor>(distributor, out var parsedDistributor, out var distributorError);
         parseOk &= TryParse<TariffGroup>(group, out var parsedGroup, out var groupError);
@@ -96,7 +131,8 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
             parsedPost,
             referenceYear,
             date,
-            isComplete ?? true);
+            isComplete ?? true,
+            distributorId);
 
         var rules = await catalog.ListGridCompensationRulesAsync(filter, cancellationToken);
         return Ok(rules.Select(ToGridRuleResponse).ToList());
@@ -121,10 +157,12 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
         return false;
     }
 
+
     private static TariffProfileResponse ToResponse(TariffProfileRecord profile) =>
         new(
             profile.Id,
-            profile.Distributor.ToString(),
+            profile.DistributorId,
+            profile.DistributorRecord?.OfficialName ?? profile.Distributor.ToString(),
             profile.Group.ToString(),
             profile.Subgroup.ToString(),
             profile.Modality.ToString(),
@@ -150,7 +188,8 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
     private static GridCompensationRuleResponse ToGridRuleResponse(GridCompensationRuleRecord rule) =>
         new(
             rule.Id,
-            rule.Distributor.ToString(),
+            rule.DistributorId,
+            rule.DistributorRecord?.OfficialName ?? rule.Distributor.ToString(),
             rule.Group?.ToString(),
             rule.Subgroup?.ToString(),
             rule.Modality?.ToString(),
@@ -167,8 +206,16 @@ public sealed class TariffsController(TariffCatalog catalog) : ControllerBase
             rule.IsComplete);
 }
 
+public sealed record DistributorResponse(
+    Guid Id,
+    string AneelId,
+    string OfficialName,
+    string? Cnpj,
+    DateTimeOffset LastSyncedAt);
+
 public sealed record TariffProfileResponse(
     Guid Id,
+    Guid? DistributorId,
     string Distributor,
     string Group,
     string Subgroup,
@@ -192,6 +239,7 @@ public sealed record TariffComponentResponse(
 
 public sealed record GridCompensationRuleResponse(
     Guid Id,
+    Guid? DistributorId,
     string Distributor,
     string? Group,
     string? Subgroup,

@@ -6,6 +6,22 @@ Criar uma ferramenta interna no CRM para transformar um lead em dimensionamento
 tecnico, cotacao comercial e proposta. O calculo nao sera exibido diretamente ao
 cliente. A proposta sera gerada pela equipe a partir dos resultados aprovados.
 
+## Decisoes atuais do escopo
+
+- O formulario recebe os 12 consumos mensais da fatura e os 12 valores mensais
+  cobrados, quando disponiveis.
+- Modulo e inversor sao informados livremente por marca, modelo e potencia. O
+  sistema pode localizar dados tecnicos na internet, mas somente grava esses
+  dados no catalogo apos confirmacao do usuario.
+- Materiais confirmados ficam disponiveis para reutilizacao em novos orcamentos.
+- O preco do material e atualizado somente por acao explicita de "Atualizar
+  precos/recalcular orcamento". O PDF ja emitido nao muda automaticamente.
+- O Excel e somente referencia de validacao. O sistema nao gera arquivo Excel.
+- Todos os calculos sao executados sistemicamente no backend e os resultados sao
+  exibidos no CRM e no PDF.
+- Os graficos sao gerados a partir dos resultados calculados, sem copiar imagens
+  da planilha.
+
 Fluxo principal:
 
 ```text
@@ -132,6 +148,14 @@ Saidas tecnicas:
 - Energia excedente e deficit mensal.
 - Alertas de tensao, corrente, area ou compatibilidade.
 - Premissas e fonte de cada parametro.
+
+Graficos calculados:
+
+- Geracao mensal, consumo mensal e geracao media ideal.
+- Fluxo financeiro acumulado por ano e ponto de retorno do investimento.
+- Comparativo anual da fatura sem solar, com solar e economia estimada.
+
+Os mesmos dados dos graficos devem ser exibidos no CRM e renderizados no PDF.
 
 O caso de referencia da planilha deve ser reproduzido como teste de regressao,
 sem transformar seus valores em defaults comerciais. Os dados do cliente sempre

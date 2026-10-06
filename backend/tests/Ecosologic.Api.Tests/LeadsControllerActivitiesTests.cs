@@ -5,6 +5,7 @@ using Ecosologic.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Ecosologic.Api.Tests;
 
@@ -35,6 +36,15 @@ public class LeadsControllerActivitiesTests
         var attributes = typeof(LeadsController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true);
         var authorize = Assert.Single(attributes);
         Assert.Equal("Admin", ((AuthorizeAttribute)authorize).Roles);
+    }
+
+    [Fact]
+    public void Activity_navigation_is_not_serialized_back_to_the_client()
+    {
+        var property = typeof(LeadActivityRecord).GetProperty(nameof(LeadActivityRecord.Lead));
+
+        Assert.NotNull(property);
+        Assert.NotNull(property!.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).SingleOrDefault());
     }
 
     [Fact]

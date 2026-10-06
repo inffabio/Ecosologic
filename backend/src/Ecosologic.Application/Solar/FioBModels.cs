@@ -11,6 +11,16 @@ public sealed record FioBRequest(
     TariffComponent BaseComponent,
     decimal CompensatedEnergyKWh);
 
+public sealed record FioBRuleSelectionRequest(
+    Distributor Distributor,
+    TariffGroup Group,
+    TariffSubgroup Subgroup,
+    TariffModality Modality,
+    TariffPost Post,
+    int ReferenceYear,
+    DateOnly ReferenceDate,
+    Guid? DistributorId = null);
+
 /// <summary>
 /// Resultado do Fio B: custo aplicado e metadados para rastreabilidade.
 /// O Fio B nunca é uma tarifa universal — o percentual incide apenas sobre a

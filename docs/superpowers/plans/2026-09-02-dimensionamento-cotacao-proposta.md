@@ -8,6 +8,15 @@
 
 **Tech Stack:** .NET 9, EF Core 9, PostgreSQL, Angular 20, TypeScript, ImageSharp/PDF template versionado.
 
+## Decisoes de escopo
+
+- Nao gerar arquivo Excel; a planilha de referencia serve apenas para regressao e validacao.
+- Receber os 12 consumos mensais e os 12 valores mensais da fatura.
+- Receber marca, modelo e potencia de modulo e inversor como texto livre.
+- Persistir materiais confirmados para reutilizacao, com historico de precos.
+- Atualizar precos somente por acao explicita de recalculo.
+- Calcular e exibir no CRM e no PDF os graficos de geracao/consumo, fluxo financeiro e economia anual.
+
 ## Global Constraints
 
 - O resultado e interno; nao sera exibido diretamente ao cliente.
@@ -98,7 +107,7 @@
 - Modify: `ops/production.md`
 - Test: renderer snapshot tests and API tests
 
-**Deliverable:** template versionado com campos de cliente, sistema, geracao, economia, equipamentos, preco, garantias e condicoes; gerar PDF sem alterar snapshots anteriores.
+**Deliverable:** template versionado com campos de cliente, sistema, geracao, economia, equipamentos, preco, garantias, condicoes e graficos calculados; gerar PDF sem alterar snapshots anteriores, salvo regeneracao explicita.
 
 ### Task 8: E2E comercial
 

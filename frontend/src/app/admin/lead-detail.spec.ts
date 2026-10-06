@@ -2,9 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
-import { LeadDetail } from './lead-detail';
+import { LeadDetail, parseAiEnrichment } from './lead-detail';
 
 describe('LeadDetail', () => {
+  it('parses the regional intelligence block from lead notes', () => {
+    const result = parseAiEnrichment('before\n<!-- AI_ENRICHMENT_START -->\nEnriquecimento regional (Maricá)\nIntenção: alta\nPotencial: alto\nEvidência pública: Busca por orçamento\nFonte: https://example.com/post\nResumo: Cliente avaliando instalação\nPróxima ação: Ligar amanhã\n<!-- AI_ENRICHMENT_END -->');
+
+    expect(result).toEqual({
+      city: 'Maricá', intent: 'alta', potential: 'alto', evidence: 'Busca por orçamento',
+      source: 'https://example.com/post', summary: 'Cliente avaliando instalação', nextAction: 'Ligar amanhã'
+    });
+  });
+
   let http: HttpTestingController;
   const route = { snapshot: { paramMap: { get: () => 'lead-id' } } };
   const lead = {
